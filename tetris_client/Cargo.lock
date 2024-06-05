@@ -3076,19 +3076,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "tetris_client"
+name = "tetris"
 version = "0.1.0"
 dependencies = [
  "bevy",
 ]
-
-[[package]]
-name = "tetris_common"
-version = "0.1.0"
-
-[[package]]
-name = "tetris_server"
-version = "0.1.0"
 
 [[package]]
 name = "thiserror"
