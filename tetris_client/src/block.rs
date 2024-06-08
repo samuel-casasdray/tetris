@@ -2,9 +2,8 @@ use bevy::asset::{Handle};
 use bevy::math::Vec3;
 use bevy::prelude::{Bundle, Component, default, Transform};
 use bevy::sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle};
+use crate::pos::Pos;
 
-#[derive(Component)]
-pub struct Pos(pub f32, pub f32);
 
 #[derive(Bundle)]
 pub struct BlockBundle {
@@ -28,7 +27,7 @@ impl BlockBundle {
             material: material_handle,
             transform: Transform {
                 translation: Vec3::new(pos.0 * block_size, pos.1 * block_size, 0.),
-                scale: Vec3::splat(1.),
+                scale: Vec3::new(block_size, block_size, 1.),
                 ..default()
             },
             ..default()

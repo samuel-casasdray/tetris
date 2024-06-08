@@ -1,17 +1,21 @@
 mod block;
 mod game_settings;
+mod board_walls;
+mod pos;
 
 use bevy::prelude::*;
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
+use bevy::sprite::{Mesh2dHandle};
 use bevy::window::WindowResized;
 use crate::block::{BlockId};
+use crate::board_walls::BoardWallsBundle;
 use crate::game_settings::GameSettings;
+use crate::pos::Pos;
 
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (setup_game, render_board).chain())
+        .add_systems(Startup, (setup_game, setup_walls).chain())
         .add_systems(Update, on_resize_system)
         .run()
 }
@@ -29,9 +33,8 @@ fn on_resize_system(
         let new_block_size = get_block_size(e.width, e.height, game_settings.board_size);
         game_settings.block_size = new_block_size;
 
-        // TODO: je sais pas si c'est nécessaire de mettre à jour le mesh ou s'il prend automatiquement la taille du transform.
         for mut transform in block_mesh_handle.iter_mut(){
-            let old_block_scale = transform.scale.clone().x;
+            let old_block_scale = transform.scale.x;
             let new_scale = old_block_scale * new_block_size / old_block_size;
             *transform = transform.with_scale(Vec3::new(new_scale, new_scale, new_scale));
         }
@@ -69,25 +72,25 @@ fn setup_game(
         ..default()
     });
 
-    let mesh_handle = Mesh2dHandle(meshes.add(Rectangle::new(block_size, block_size)));
+    let mesh_handle = Mesh2dHandle(meshes.add(Rectangle::new(1.,1.)));
     let material_handle1 = materials.add(Color::hex("FF0000").unwrap());
     let material_handle2 = materials.add(Color::hex("00FF00").unwrap());
     let material_handle3 = materials.add(Color::hex("0000FF").unwrap());
 
     let block1 = block::BlockBundle::new(
-        block::Pos(0., 0.),
+        Pos(0., 0.),
         mesh_handle.clone(),
         material_handle1,
         block_size,
     );
     let block2 = block::BlockBundle::new(
-        block::Pos(1., 0.),
+        Pos(1., 0.),
         mesh_handle.clone(),
         material_handle2,
         block_size,
     );
     let block3 = block::BlockBundle::new(
-        block::Pos(3., 0.),
+        Pos(3., 0.),
         mesh_handle.clone(),
         material_handle3,
         block_size,
@@ -101,7 +104,7 @@ fn setup_game(
     commands.spawn(block3);
 }
 
-fn render_board(
+fn setup_walls(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -109,41 +112,44 @@ fn render_board(
 ) {
     let block_size = game_settings.block_size;
     let (board_width, board_height) = game_settings.board_size;
-    let wall_width = 5.;
 
-    let horizontal_bar_width = block_size * board_width;
-    let vertical_bar_height = block_size * board_height;
+    let mesh = Mesh2dHandle(meshes.add(Rectangle::new(1., 1.)));
 
-    let horizontal_bar = Mesh2dHandle(meshes.add(Rectangle::new(horizontal_bar_width + block_size, wall_width)));
-    let vertical_bar = Mesh2dHandle(meshes.add(Rectangle::new(wall_width, vertical_bar_height + block_size)));
+    let color = materials.add(Color::hex("FFFFFF").unwrap());
 
-    let color = Color::hex("FFFFFF").unwrap();
+    let left_wall = BoardWallsBundle::left_wall(
+        Pos(0., 0.),
+        mesh.clone(),
+        color.clone(),
+        block_size,
+        board_height,
+    );
+    let right_wall = BoardWallsBundle::right_wall(
+        Pos(game_settings.board_size.0, 0.),
+        mesh.clone(),
+        color.clone(),
+        block_size,
+        board_height,
+    );
+    let top_wall = BoardWallsBundle::top_wall(
+        Pos(game_settings.board_size.0, 0.),
+        mesh.clone(),
+        color.clone(),
+        block_size,
+        board_width,
+    );
+    let bottom_wall = BoardWallsBundle::bottom_wall(
+        Pos(game_settings.board_size.0, 0.),
+        mesh.clone(),
+        color.clone(),
+        block_size,
+        board_width,
+    );
 
-    let top_position = board_to_screen(0., board_height, Some(Offset(horizontal_bar_width / 2., block_size / 2.)), block_size);
-    let bottom_position = board_to_screen(0., 0., Some(Offset(horizontal_bar_width / 2., block_size / -2.)), block_size);
-    let left_position = board_to_screen(0., 0., Some(Offset(block_size / -2., vertical_bar_height / 2.)), block_size);
-    let right_position = board_to_screen(board_width, 0., Some(Offset(block_size / 2., vertical_bar_height / 2.)), block_size);
-
-    let shapes = [
-        (horizontal_bar.clone(), top_position.0, top_position.1),
-        (horizontal_bar, bottom_position.0, bottom_position.1),
-        (vertical_bar.clone(), left_position.0, left_position.1),
-        (vertical_bar, right_position.0, right_position.1),
-    ];
-
-    for (shape, x, y) in shapes {
-        let lol = MaterialMesh2dBundle {
-            mesh: shape,
-            material: materials.add(color),
-            transform: Transform {
-                translation: Vec3::new(x, y, 0.),
-                scale: Vec3::splat(1.),
-                ..default()
-            },
-            ..default()
-        };
-        commands.spawn(lol);
-    }
+    commands.spawn(left_wall);
+    commands.spawn(right_wall);
+    commands.spawn(top_wall);
+    commands.spawn(bottom_wall);
 }
 
 
