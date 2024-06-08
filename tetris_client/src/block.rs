@@ -1,15 +1,14 @@
-use bevy::asset::{Handle};
-use bevy::math::Vec3;
-use bevy::prelude::{Bundle, Component, default, Transform};
-use bevy::sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle};
-use crate::pos::Pos;
+use bevy::math::{Vec2, Vec3};
+use bevy::prelude::{Bundle, Color, Component, default, Sprite, Transform};
+use bevy::sprite::SpriteBundle;
 
+use crate::pos::Pos;
 
 #[derive(Bundle)]
 pub struct BlockBundle {
     id: BlockId,
     position: Pos,
-    pub mesh: MaterialMesh2dBundle<ColorMaterial>,
+    pub sprite_bundle: SpriteBundle,
 }
 
 #[derive(Component)]
@@ -18,16 +17,21 @@ pub struct BlockId;
 impl BlockBundle {
     pub fn new(
         pos: Pos,
-        mesh_handle: Mesh2dHandle,
-        material_handle: Handle<ColorMaterial>,
+        color: Color,
         block_size: f32,
     ) -> Self {
-        let mesh = MaterialMesh2dBundle {
-            mesh: mesh_handle,
-            material: material_handle,
+        let sprite_bundle = SpriteBundle {
+            sprite: Sprite {
+                color,
+                custom_size: Some(
+                    Vec2::new(block_size, block_size)
+                ),
+                anchor: bevy::sprite::Anchor::BottomLeft,
+                ..default()
+            },
             transform: Transform {
                 translation: Vec3::new(pos.0 * block_size, pos.1 * block_size, 0.),
-                scale: Vec3::new(block_size, block_size, 1.),
+                scale: Vec3::splat(1.),
                 ..default()
             },
             ..default()
@@ -36,16 +40,7 @@ impl BlockBundle {
         Self {
             id: BlockId,
             position: pos,
-            mesh,
-        }
-    }
-
-    pub fn update_position(&mut self, position: Pos) {
-        self.position = position;
-        self.mesh.transform = Transform {
-            translation: Vec3::new(self.position.0, self.position.1, 0.),
-            scale: Vec3::splat(1.),
-            ..default()
+            sprite_bundle,
         }
     }
 }

@@ -1,111 +1,97 @@
-use bevy::asset::Handle;
-use bevy::math::{Vec2};
-use bevy::prelude::{Bundle, ColorMaterial, default, Transform};
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
+use bevy::math::{Vec2, Vec3};
+use bevy::prelude::{Bundle, Color, default, Sprite, SpriteBundle, Transform};
 use crate::pos::Pos;
-
-const WALL_WIDTH: f32 = 25.;
 
 #[derive(Bundle)]
 pub struct BoardWallsBundle {
     position: Pos,
-    pub mesh: MaterialMesh2dBundle<ColorMaterial>,
+    pub sprite_bundle: SpriteBundle,
 }
 
 
 impl BoardWallsBundle {
     pub fn bottom_wall(
         pos: Pos,
-        mesh_handle: Mesh2dHandle,
-        material_handle: Handle<ColorMaterial>,
         block_size: f32,
         wall_size: f32,
+        wall_width: f32,
     ) -> Self {
-        let mesh = get_wall_mesh(
-            mesh_handle,
-            material_handle,
-            Vec2 { x: 0., y: 0. },
-            Vec2 { x: wall_size * block_size, y: WALL_WIDTH },
+        let sprite_bundle = get_wall_sprite_bundle(
+            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
+            Vec2 { x: wall_size * block_size, y: wall_width },
         );
 
         Self {
             position: pos,
-            mesh,
+            sprite_bundle,
         }
     }
     pub fn top_wall(
         pos: Pos,
-        mesh_handle: Mesh2dHandle,
-        material_handle: Handle<ColorMaterial>,
         block_size: f32,
         wall_size: f32,
+        wall_width: f32,
     ) -> Self {
-        let mesh = get_wall_mesh(
-            mesh_handle,
-            material_handle,
-            Vec2 { x: 0., y: wall_size * block_size },
-            Vec2 { x: wall_size * block_size, y: WALL_WIDTH },
+        let sprite_bundle = get_wall_sprite_bundle(
+            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
+            Vec2 { x: wall_size * block_size, y: wall_width },
         );
 
         Self {
             position: pos,
-            mesh,
+            sprite_bundle,
         }
     }
 
     pub fn left_wall(
         pos: Pos,
-        mesh_handle: Mesh2dHandle,
-        material_handle: Handle<ColorMaterial>,
         block_size: f32,
         wall_size: f32,
+        wall_width: f32,
     ) -> Self {
-        let mesh = get_wall_mesh(
-            mesh_handle,
-            material_handle,
-            Vec2 { x: wall_size * block_size / -2., y: 0. },
-            Vec2 { x: WALL_WIDTH, y: wall_size * block_size },
+        let sprite_bundle = get_wall_sprite_bundle(
+            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
+            Vec2 { x: wall_width, y: wall_size * block_size },
         );
 
         Self {
             position: pos,
-            mesh,
+            sprite_bundle,
         }
     }
 
     pub fn right_wall(
         pos: Pos,
-        mesh_handle: Mesh2dHandle,
-        material_handle: Handle<ColorMaterial>,
         block_size: f32,
         wall_size: f32,
+        wall_width: f32,
     ) -> Self {
-        let mesh = get_wall_mesh(
-            mesh_handle,
-            material_handle,
-            Vec2 { x: wall_size * block_size / 2., y: 0. },
-            Vec2 { x: WALL_WIDTH, y: wall_size * block_size },
+        let sprite_bundle = get_wall_sprite_bundle(
+            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
+            Vec2 { x: wall_width, y: wall_size * block_size },
         );
 
         Self {
             position: pos,
-            mesh,
+            sprite_bundle,
         }
     }
 }
 
-fn get_wall_mesh(
-    mesh_handle: Mesh2dHandle,
-    material_handle: Handle<ColorMaterial>,
+fn get_wall_sprite_bundle(
     position: Vec2,
-    scale: Vec2,
-) -> MaterialMesh2dBundle<ColorMaterial> {
-    MaterialMesh2dBundle {
-        mesh: mesh_handle,
-        material: material_handle,
+    size: Vec2,
+) -> SpriteBundle {
+    SpriteBundle {
+        sprite: Sprite {
+            color: Color::WHITE,
+            custom_size: Some(size),
+            anchor: bevy::sprite::Anchor::BottomLeft,
+            ..default()
+        },
         transform: Transform {
             translation: position.extend(0.),
-            scale: scale.extend(1.),
+            scale: Vec3::splat(1.),
             ..default()
         },
         ..default()
