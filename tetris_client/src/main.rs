@@ -56,12 +56,12 @@ struct Block;
 #[derive(Resource)]
 struct BlockSize(f32);
 
-fn setup_game(mut commands: Commands, window: Query<&Window>, block_size: ResMut<BlockSize>){
+fn setup_game(mut commands: Commands, window: Query<&Window>){
     let window = window.single();
     let size = get_block_size(window.width(), window.height());
     commands.insert_resource(BlockSize(size));
 
-    let cam_position = boardToScreen(BOARD_WIDTH as f32, BOARD_HEIGHT as f32, None, block_size.0);
+    let cam_position = boardToScreen(BOARD_WIDTH as f32, BOARD_HEIGHT as f32, None, size);
     commands.spawn(Camera2dBundle {
         transform: Transform::from_xyz(cam_position.0 / 2., cam_position.1 / 2., 0.0),
         ..default()
@@ -93,22 +93,23 @@ fn renderBoard(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    block_size: ResMut<BlockSize>
+    block_size_res: Res<BlockSize>
 ) {
+    let block_size = block_size_res.0;
     let wall_width = 5.;
 
-    let horizontal_bar_width = block_size.as_ref().0 * BOARD_WIDTH as f32;
-    let vertical_bar_height = block_size.as_ref().0 * BOARD_HEIGHT as f32;
+    let horizontal_bar_width = block_size * BOARD_WIDTH as f32;
+    let vertical_bar_height = block_size * BOARD_HEIGHT as f32;
 
-    let horizontal_bar = Mesh2dHandle(meshes.add(Rectangle::new(horizontal_bar_width + BLOCK_SIZE, wall_width)));
-    let vertical_bar = Mesh2dHandle(meshes.add(Rectangle::new(wall_width, vertical_bar_height + BLOCK_SIZE)));
+    let horizontal_bar = Mesh2dHandle(meshes.add(Rectangle::new(horizontal_bar_width + block_size, wall_width)));
+    let vertical_bar = Mesh2dHandle(meshes.add(Rectangle::new(wall_width, vertical_bar_height + block_size)));
 
     let color = Color::hex("FFFFFF").unwrap();
 
-    let top_position = boardToScreen(0., BOARD_HEIGHT as f32, Some(Offset(horizontal_bar_width / 2., BLOCK_SIZE / 2.)));
-    let bottom_position = boardToScreen(0., 0., Some(Offset(horizontal_bar_width / 2., BLOCK_SIZE / -2.)));
-    let left_position = boardToScreen(0., 0., Some(Offset(BLOCK_SIZE / -2., vertical_bar_height / 2.)));
-    let right_position = boardToScreen(BOARD_WIDTH as f32, 0., Some(Offset(BLOCK_SIZE / 2., vertical_bar_height / 2.)));
+    let top_position = boardToScreen(0., BOARD_HEIGHT as f32, Some(Offset(horizontal_bar_width / 2., block_size / 2.)), block_size);
+    let bottom_position = boardToScreen(0., 0., Some(Offset(horizontal_bar_width / 2., block_size / -2.)), block_size);
+    let left_position = boardToScreen(0., 0., Some(Offset(block_size / -2., vertical_bar_height / 2.)), block_size);
+    let right_position = boardToScreen(BOARD_WIDTH as f32, 0., Some(Offset(block_size / 2., vertical_bar_height / 2.)), block_size);
 
     let shapes = [
         (horizontal_bar.clone(), top_position.0, top_position.1),
