@@ -3,21 +3,21 @@ use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 use bevy::window::WindowResized;
 // use rand::Rng;
 
-const BOARD_WIDTH:usize = 10;
-const BOARD_HEIGHT:usize = 20;
+const BOARD_WIDTH: usize = 10;
+const BOARD_HEIGHT: usize = 20;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (setup_game, renderBlocks).chain())
+        .add_systems(Startup, (setup_game, renderBoard, renderBlocks).chain())
         .add_systems(Update, on_resize_system)
         .run()
 }
 
 fn on_resize_system(
-    mut camera2d_bundle: Query<&mut Transform, With<Camera>>, 
-    mut resize_reader: EventReader<WindowResized>, 
-    mut block_size: ResMut<BlockSize>, 
+    mut camera2d_bundle: Query<&mut Transform, With<Camera>>,
+    mut resize_reader: EventReader<WindowResized>,
+    mut block_size: ResMut<BlockSize>,
     mut blocks : Query<&mut Transform, (With<Block>, Without<Camera>)>
 ) {
     for e in resize_reader.read() {
@@ -46,7 +46,7 @@ fn get_block_size(width: f32, height: f32) -> f32{
 struct MyColor(Color);
 
 #[derive(Component)]
-struct Board{
+struct Board {
     blocks: Vec<Option<MyColor>>,
 }
 
@@ -56,26 +56,24 @@ struct Block;
 #[derive(Resource)]
 struct BlockSize(f32);
 
-fn setup_game(mut commands: Commands, window: Query<&Window>){
+fn setup_game(mut commands: Commands, window: Query<&Window>, block_size: ResMut<BlockSize>){
     let window = window.single();
     let size = get_block_size(window.width(), window.height());
     commands.insert_resource(BlockSize(size));
 
+    let cam_position = boardToScreen(BOARD_WIDTH as f32, BOARD_HEIGHT as f32, None, block_size.0);
     commands.spawn(Camera2dBundle {
-        transform: Transform {
-            translation: Vec3::new(window.width() / 2., window.height() / -2., 0.),
-            ..default()
-        },
+        transform: Transform::from_xyz(cam_position.0 / 2., cam_position.1 / 2., 0.0),
         ..default()
     });
 
     // let mut rng = rand::thread_rng();
     // let mut blocks = Vec::<Option<MyColor>>::new();
-    // 
+    //
     // for i in 0..(BOARD_WIDTH*BOARD_HEIGHT) {
     //     blocks.push(Some(MyColor(Color::rgb(rng.gen(), rng.gen(), rng.gen()))))
     // }
-    
+
     let mut blocks = vec![None; BOARD_WIDTH * BOARD_HEIGHT];
 
     blocks[0] = Some(MyColor(Color::hex(String::from("FF0000")).unwrap()));
@@ -84,11 +82,64 @@ fn setup_game(mut commands: Commands, window: Query<&Window>){
     blocks[3] = Some(MyColor(Color::hex(String::from("FFFF00")).unwrap()));
     blocks[4] = Some(MyColor(Color::hex(String::from("FF00FF")).unwrap()));
 
-    let mut board = Board {
+    let board = Board {
         blocks,
     };
 
     commands.spawn(board);
+}
+
+fn renderBoard(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    block_size: ResMut<BlockSize>
+) {
+    let wall_width = 5.;
+
+    let horizontal_bar_width = block_size.as_ref().0 * BOARD_WIDTH as f32;
+    let vertical_bar_height = block_size.as_ref().0 * BOARD_HEIGHT as f32;
+
+    let horizontal_bar = Mesh2dHandle(meshes.add(Rectangle::new(horizontal_bar_width + BLOCK_SIZE, wall_width)));
+    let vertical_bar = Mesh2dHandle(meshes.add(Rectangle::new(wall_width, vertical_bar_height + BLOCK_SIZE)));
+
+    let color = Color::hex("FFFFFF").unwrap();
+
+    let top_position = boardToScreen(0., BOARD_HEIGHT as f32, Some(Offset(horizontal_bar_width / 2., BLOCK_SIZE / 2.)));
+    let bottom_position = boardToScreen(0., 0., Some(Offset(horizontal_bar_width / 2., BLOCK_SIZE / -2.)));
+    let left_position = boardToScreen(0., 0., Some(Offset(BLOCK_SIZE / -2., vertical_bar_height / 2.)));
+    let right_position = boardToScreen(BOARD_WIDTH as f32, 0., Some(Offset(BLOCK_SIZE / 2., vertical_bar_height / 2.)));
+
+    let shapes = [
+        (horizontal_bar.clone(), top_position.0, top_position.1),
+        (horizontal_bar, bottom_position.0, bottom_position.1),
+        (vertical_bar.clone(), left_position.0, left_position.1),
+        (vertical_bar, right_position.0, right_position.1),
+    ];
+
+    for (shape, x, y) in shapes {
+        commands.spawn(MaterialMesh2dBundle {
+            mesh: shape,
+            material: materials.add(color),
+            transform: Transform {
+                translation: Vec3::new(x, y, 0.),
+                scale: Vec3::splat(1.),
+                ..default()
+            },
+            ..default()
+        });
+    }
+}
+
+
+struct Offset(f32, f32);
+
+// Ne marche pas encore comme je le souhaite
+fn boardToScreen(x: f32, y: f32, offset: Option<Offset>, block_size: f32) -> (f32, f32) {
+    match offset {
+        None => (x * block_size, y * block_size),
+        Some(Offset(x_offset, y_offset)) => (x * block_size + x_offset, y * block_size + y_offset),
+    }
 }
 
 fn renderBlocks(
@@ -104,12 +155,12 @@ fn renderBlocks(
             let y = (index / BOARD_WIDTH) as f32;
             let shape = Mesh2dHandle(meshes.add(Rectangle::new(block_size.as_ref().0, block_size.as_ref().0)));
 
-            commands.spawn((MaterialMesh2dBundle{
+            commands.spawn((MaterialMesh2dBundle {
                 mesh: shape,
                 material: materials.add(*color),
                 transform: Transform {
                     translation: Vec3::new(x*block_size.as_ref().0, -y * block_size.as_ref().0, 0.),
-                    scale: Vec3::new(1., 1., 1.),
+                    scale: Vec3::splat(1.),
                     ..default()
                 },
                 ..default()
