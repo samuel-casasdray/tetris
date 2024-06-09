@@ -82,13 +82,14 @@ impl From<(i32, i32)> for Block {
     }
 }
 
-#[derive(Component)]
-pub struct Position {
+/// A position inside the tetris board grid
+#[derive(Component, Clone)]
+pub struct GridPosition {
     pub x: i32,
     pub y: i32,
 }
 
-impl From<(i32, i32)> for Position {
+impl From<(i32, i32)> for GridPosition {
     fn from((x, y): (i32, i32)) -> Self {
         Self {
             x,

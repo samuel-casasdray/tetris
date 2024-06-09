@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use bevy::window::WindowResized;
 
 use tetris_common::CommonPlugin;
-use tetris_common::components::Block;
+use tetris_common::components::{Block, GridPosition};
 
-use crate::board_ui_calculator::{BoardUICalculator, InBoardPoint};
+use crate::board_ui_calculator::BoardUICalculator;
 use crate::board_walls::{BoardWall, BoardWallsBundle};
 
 pub const DEFAULT_BOARD_WIDTH: usize = 10;
@@ -40,7 +40,7 @@ fn setup_sprites(
         let y = block.y;
         commands.entity(entity).insert(block::new_block(
             &board_calculator,
-            InBoardPoint(x, y),
+            GridPosition{x, y},
             colors[(x + y) as usize % colors.len()],
             board_calculator.block_size,
         ));
