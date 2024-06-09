@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::WindowResized;
 
+use tetris_common::CommonPlugin;
+
 use crate::board_ui_calculator::{BoardPoint, BoardUICalculator};
 use crate::board_walls::{BoardWall, BoardWallsBundle};
 use crate::game_settings::GameSettings;
@@ -13,6 +15,7 @@ mod board_ui_calculator;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(CommonPlugin)
         .add_systems(Startup, (setup_resources, setup_game, setup_walls).chain())
         .add_systems(Update, on_resize_system)
         .run()

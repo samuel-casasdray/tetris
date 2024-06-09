@@ -3118,6 +3118,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "rand",
+ "tetris_common",
 ]
 
 [[package]]

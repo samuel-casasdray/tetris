@@ -1,4 +1,4 @@
-use bevy::prelude::{Children, Commands, EventWriter, Query, With};
+use bevy::prelude::{Children, EventWriter, Query, With};
 
 use crate::components::{Block, Board, Owned, Shape, Fake};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
