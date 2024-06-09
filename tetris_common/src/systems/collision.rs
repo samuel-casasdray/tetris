@@ -3,12 +3,6 @@ use bevy::prelude::{Children, Commands, EventWriter, Query, With};
 use crate::components::{Block, Board, Owned, Shape, Fake};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 
-pub fn setup_board(mut command: Commands) {
-    command.spawn((Owned, Board {
-        width: 20,
-        height: 10,
-    }));
-}
 
 pub fn collision_check(
     current_board_children: Query<&Children, With<Owned>>,
