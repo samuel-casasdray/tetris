@@ -1,3 +1,6 @@
 [workspace]
 resolver = "2"
 members = ["tetris_client", "tetris_common", "tetris_server"]
+
+[workspace.dependencies]
+bevy = "0.13"

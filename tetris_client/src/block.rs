@@ -2,7 +2,7 @@ use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Bundle, Color, Component, default, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
-use crate::board::{BoardCalculator, BoardPoint};
+use crate::board_ui_calculator::{BoardPoint, BoardUICalculator};
 
 #[derive(Bundle)]
 pub struct BlockBundle {
@@ -16,7 +16,7 @@ pub struct BlockId;
 
 impl BlockBundle {
     pub fn new(
-        board_calculator: &BoardCalculator,
+        board_calculator: &BoardUICalculator,
         board_position: BoardPoint,
         color: Color,
         block_size: f32,

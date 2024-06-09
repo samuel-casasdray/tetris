@@ -6,6 +6,7 @@ const DEFAULT_BLOCK_SIZE: f32 = 50.;
 
 #[derive(Resource, Clone)]
 pub struct GameSettings {
+    // TODO: déjà géré par le boardUiCalculator, faut-il l'enlever ?
     pub block_size: f32,
     pub board_size: (usize, usize),
 }
