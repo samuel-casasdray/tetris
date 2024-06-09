@@ -1,6 +1,6 @@
-use bevy::prelude::{App, Plugin, Startup, Update};
+use bevy::prelude::{App, Plugin, Startup};
 
-use crate::systems::{collision_check, setup_board};
+use crate::systems::setup_board;
 
 pub mod components;
 pub mod events;
@@ -10,7 +10,7 @@ pub struct CommonPlugin;
 
 impl Plugin for CommonPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_board)
-            .add_systems(Update, collision_check);
+        app.add_systems(Startup, setup_board);
+            // .add_systems(Update, collision_check);
     }
 }

@@ -1,16 +1,17 @@
 use bevy::math::Vec2;
 use bevy::prelude::{Component, Resource};
 
-// TODO: Bouger ce component dans la common lib
+pub const DEFAULT_BOARD_WIDTH: usize = 10;
+pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 #[derive(Component, Clone)]
 pub struct BoardPoint(pub i32, pub i32);
 
 #[derive(Resource)]
 pub struct BoardUICalculator {
-    board_position: Vec2,
-    board_height: usize,
-    board_width: usize,
-    block_size: f32,
+    pub board_position: Vec2,
+    pub board_height: usize,
+    pub board_width: usize,
+    pub block_size: f32,
 }
 
 impl BoardUICalculator {
