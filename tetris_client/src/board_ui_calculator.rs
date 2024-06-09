@@ -1,8 +1,6 @@
 use bevy::math::Vec2;
 use bevy::prelude::{Component, Resource};
 
-pub const DEFAULT_BOARD_WIDTH: usize = 10;
-pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 #[derive(Component, Clone)]
 pub struct BoardPoint(pub i32, pub i32);
 

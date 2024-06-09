@@ -4,8 +4,11 @@ use bevy::window::WindowResized;
 use tetris_common::CommonPlugin;
 use tetris_common::components::Block;
 
-use crate::board_ui_calculator::{BoardPoint, BoardUICalculator, DEFAULT_BOARD_HEIGHT, DEFAULT_BOARD_WIDTH};
+use crate::board_ui_calculator::{BoardPoint, BoardUICalculator};
 use crate::board_walls::{BoardWall, BoardWallsBundle};
+
+pub const DEFAULT_BOARD_WIDTH: usize = 10;
+pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 
 mod block;
 mod board_walls;
@@ -48,14 +51,14 @@ fn on_resize_system(
     mut camera2d_bundle: Query<&mut Transform, With<Camera>>,
     mut resize_reader: EventReader<WindowResized>,
     mut board_calculator: ResMut<BoardUICalculator>,
-    mut blocks : Query<&mut Transform, (With<Block>, Without<Camera>)>
+    mut blocks: Query<&mut Transform, (With<Block>, Without<Camera>)>,
 ) {
     for window in resize_reader.read() {
         camera2d_bundle.single_mut().translation = Vec3::new(window.width / 2., window.height / 2., 0.);
         let old_block_size = board_calculator.block_size;
-        board_calculator.block_size = get_block_size(window.width, window.height, DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+        board_calculator.block_size = get_block_size(window.width, window.height, board_calculator.board_width, board_calculator.board_height);
         for mut block in blocks.iter_mut() {
-            let old_block_scale = block.scale.clone().x;
+            let old_block_scale = block.scale.x;
             let new_scale = old_block_scale * board_calculator.block_size / old_block_size;
             *block = block.with_scale(Vec3::new(new_scale, new_scale, new_scale));
         }
