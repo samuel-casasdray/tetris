@@ -1,14 +1,13 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use bevy::prelude::{App, Plugin};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod systems;
+mod components;
+mod events;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+pub struct CommonPlugin;
+
+impl Plugin for CommonPlugin {
+    fn build(&self, app: &mut App) {
+        // add things to your app here
     }
 }
