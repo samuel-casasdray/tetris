@@ -1,7 +1,7 @@
 use bevy::prelude::Resource;
 
-const DEFAULT_BOARD_WIDTH: usize = 10;
-const DEFAULT_BOARD_HEIGHT: usize = 20;
+pub const DEFAULT_BOARD_WIDTH: usize = 10;
+pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 const DEFAULT_BLOCK_SIZE: f32 = 50.;
 
 #[derive(Resource, Clone)]

@@ -5,7 +5,7 @@ use tetris_common::CommonPlugin;
 
 use crate::board_ui_calculator::{BoardPoint, BoardUICalculator};
 use crate::board_walls::{BoardWall, BoardWallsBundle};
-use crate::game_settings::GameSettings;
+use crate::game_settings::{GameSettings, DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT};
 
 mod block;
 mod game_settings;
@@ -24,10 +24,25 @@ fn main() {
 fn on_resize_system(
     mut camera2d_bundle: Query<&mut Transform, With<Camera>>,
     mut resize_reader: EventReader<WindowResized>,
+    // mut block_size: ResMut<BlockSize>,
+    // mut blocks : Query<&mut Transform, (With<Block>, Without<Camera>)>
 ) {
     for window in resize_reader.read() {
         camera2d_bundle.single_mut().translation = Vec3::new(window.width / 2., window.height / 2., 0.);
+        // let old_block_size = block_size.0;
+        // block_size.0 = get_block_size(window.width, window.height, DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT);
+        // for mut block in blocks.iter_mut() {
+        //     let old_block_scale = block.scale.clone().x;
+        //     let new_scale = old_block_scale * block_size.0 / old_block_size;
+        //     *block = block.with_scale(Vec3::new(new_scale, new_scale, new_scale));
+        // }
     }
+}
+
+fn get_block_size(width: f32, height: f32, board_width: usize, board_height: usize) -> f32{
+    let width = width * 0.4;
+    let height = height * 0.9;
+    (width / board_width as f32).min(height / board_height as f32)
 }
 
 fn setup_resources(
@@ -36,11 +51,13 @@ fn setup_resources(
 ) {
     let window = window.single();
     let game_settings = GameSettings {
-        block_size: 50.,
+        block_size: get_block_size(window.width(), window.height(), DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT),
         ..default()
     };
+    let x = (window.width() - game_settings.block_size * (DEFAULT_BOARD_WIDTH + 2) as f32) / 2.;
+    let y = (window.height() - game_settings.block_size * DEFAULT_BOARD_HEIGHT as f32) / 2.;
     let board_calculator = BoardUICalculator::new(
-        Vec2::new(window.width() / 2., window.height() / 2.),
+        Vec2::new(x, y),
         game_settings.block_size,
         game_settings.board_size.1,
         game_settings.board_size.0,
