@@ -11,7 +11,8 @@ pub fn setup_board(mut command: Commands) {
 }
 
 pub fn collision_check(
-    current_board: Query<(&Board, &Children), With<CurrentBoard>>,
+    current_board_children: Query<&Children, With<CurrentBoard>>,
+    current_board: Query<&Board, With<CurrentBoard>>,
     controlled_shape: Query<(&Shape, &Children), With<ControlledShape>>,
     blocks: Query<&Block>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
@@ -22,12 +23,25 @@ pub fn collision_check(
         Err(_) => return,
     };
 
-    let (_board, children) = current_board.single();
-    for block in blocks.iter_many(children) {
-        for shape_blocks in blocks.iter_many(controlled_shape_entities) {
-            // Check collision with shapes block
-            if block.x == shape_blocks.x && block.y == shape_blocks.y {
-                ev_block_collision.send(BlockCollisionEvent);
+    let board = current_board.single();
+    for shape_block in blocks.iter_many(controlled_shape_entities) {
+        // Check collision with walls
+        match (shape_block.x, shape_block.y) {
+            (_, 0) | (0, _) => { ev_wall_collision.send(WallCollisionEvent); }
+            (x, _)  if x >= board.width => { ev_wall_collision.send(WallCollisionEvent); }
+            _ => {}
+        };
+    }
+
+    let children_result = current_board_children.get_single();
+    if let Ok(children) = children_result {
+        for block in blocks.iter_many(children) {
+            for shape_blocks in blocks.iter_many(controlled_shape_entities) {
+                // Check collision with shapes block
+                if block.x == shape_blocks.x && block.y == shape_blocks.y {
+                    ev_block_collision.send(BlockCollisionEvent);
+                    return;
+                }
             }
         }
     }
@@ -43,11 +57,11 @@ mod tests {
     use crate::systems::collision_check;
 
     #[derive(Resource)]
-    struct TestState(bool);
+    struct ShouldCollide(bool);
 
     #[allow(private_interfaces)]
     pub fn test_checker_collision(
-        test_init_state: Res<TestState>,
+        test_init_state: Res<ShouldCollide>,
         mut ev_block_collision: EventReader<BlockCollisionEvent>,
         mut ev_wall_collision: EventReader<BlockCollisionEvent>,
     ) {
@@ -55,7 +69,13 @@ mod tests {
         for _ in ev_block_collision.read() {
             should_assert = !should_assert;
         }
-        assert!(should_assert)
+        assert!(should_assert);
+
+        should_assert = test_init_state.0;
+        for _ in ev_wall_collision.read() {
+            should_assert = !should_assert;
+        }
+        assert!(should_assert);
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
@@ -73,10 +93,10 @@ mod tests {
                 y: 10,
             });
         });
-        commands.insert_resource(TestState(true))
+        commands.insert_resource(ShouldCollide(true))
     }
 
-    pub fn setup_board_collision(mut commands: Commands) {
+    pub fn setup_board_block_collision(mut commands: Commands) {
         commands.spawn((CurrentBoard, Board::default()))
             .with_children(|parent| {
                 parent.spawn(Block {
@@ -91,11 +111,22 @@ mod tests {
                 y: 10,
             });
         });
-        commands.insert_resource(TestState(true))
+        commands.insert_resource(ShouldCollide(true))
+    }
+
+    pub fn setup_board_wall_collision(mut commands: Commands) {
+        commands.spawn((CurrentBoard, Board::default()));
+        commands.spawn((ControlledShape, Shape)).with_children(|parent| {
+            parent.spawn(Block {
+                x: 0,
+                y: 10,
+            });
+        });
+        commands.insert_resource(ShouldCollide(true))
     }
 
     #[test]
-    fn no_collision_should_occur() {
+    fn block_no_collision_should_occur() {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
@@ -104,11 +135,29 @@ mod tests {
     }
 
     #[test]
-    fn collision_should_occur() {
+    fn block_collision_should_occur() {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
-            .add_systems(Startup, (setup_board_collision, collision_check, test_checker_collision).chain())
+            .add_systems(Startup, (setup_board_block_collision, collision_check, test_checker_collision).chain())
+            .run()
+    }
+
+    #[test]
+    fn no_wall_collision_should_occur() {
+        App::new()
+            .add_event::<BlockCollisionEvent>()
+            .add_event::<WallCollisionEvent>()
+            .add_systems(Startup, (setup_board_no_collision, collision_check, test_checker_collision).chain())
+            .run()
+    }
+
+    #[test]
+    fn wall_collision_should_occur() {
+        App::new()
+            .add_event::<BlockCollisionEvent>()
+            .add_event::<WallCollisionEvent>()
+            .add_systems(Startup, (setup_board_wall_collision, collision_check, test_checker_collision).chain())
             .run()
     }
 }

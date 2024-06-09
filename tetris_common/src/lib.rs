@@ -1,8 +1,8 @@
 use bevy::prelude::{App, Plugin};
 
-mod systems;
-mod components;
-mod events;
+pub mod systems;
+pub mod components;
+pub mod events;
 
 pub struct CommonPlugin;
 
