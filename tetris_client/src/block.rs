@@ -2,11 +2,11 @@ use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Color, default, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
-use crate::board_ui_calculator::{BoardPoint, BoardUICalculator};
+use crate::board_ui_calculator::{BoardUICalculator, InBoardPoint};
 
 pub fn new_block(
     board_calculator: &BoardUICalculator,
-    block_position: BoardPoint,
+    block_position: InBoardPoint,
     color: Color,
     block_size: f32,
 ) -> SpriteBundle {
