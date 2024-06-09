@@ -4,10 +4,7 @@ use crate::components::{Block, Board, ControlledShape, CurrentBoard, Shape};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 
 pub fn setup_board(mut command: Commands) {
-    command.spawn((CurrentBoard, Board {
-        width: 20,
-        height: 10,
-    }));
+    command.spawn((CurrentBoard, Board::default()));
 }
 
 pub fn collision_check(
