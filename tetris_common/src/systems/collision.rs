@@ -1,13 +1,12 @@
 use bevy::prelude::{Children, EventWriter, Query, With};
 
-use crate::components::{Block, Board, Owned, Shape, Fake};
+use crate::components::{Block, Board, Fake, Owned, Tetromino};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
-
 
 pub fn collision_check(
     current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
-    controlled_shape: Query<(&Shape, &Children), With<Fake>>,
+    controlled_shape: Query<(&Tetromino, &Children), With<Fake>>,
     blocks: Query<&Block>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut ev_wall_collision: EventWriter<WallCollisionEvent>,
@@ -52,7 +51,7 @@ mod tests {
     use bevy::app::{App, Startup};
     use bevy::prelude::{BuildChildren, Commands, EventReader, IntoSystemConfigs, Res, Resource};
 
-    use crate::components::{Block, Board, Owned, Shape, Fake};
+    use crate::components::{Block, Board, Fake, Owned, Tetromino};
     use crate::events::{BlockCollisionEvent, WallCollisionEvent};
     use crate::systems::collision_check;
 
@@ -87,7 +86,7 @@ mod tests {
                 });
             });
 
-        commands.spawn((Fake, Shape)).with_children(|parent| {
+        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
             parent.spawn(Block {
                 x: 11,
                 y: 10,
@@ -105,7 +104,7 @@ mod tests {
                 });
             });
 
-        commands.spawn((Fake, Shape)).with_children(|parent| {
+        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
             parent.spawn(Block {
                 x: 11,
                 y: 10,
@@ -116,7 +115,7 @@ mod tests {
 
     pub fn setup_board_wall_collision(mut commands: Commands) {
         commands.spawn((Owned, Board::default()));
-        commands.spawn((Fake, Shape)).with_children(|parent| {
+        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
             parent.spawn(Block {
                 x: -1,
                 y: 10,

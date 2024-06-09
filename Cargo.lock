@@ -3117,7 +3117,6 @@ name = "tetris_client"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "rand",
  "tetris_common",
 ]
 
@@ -3126,6 +3125,7 @@ name = "tetris_common"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "rand",
 ]
 
 [[package]]

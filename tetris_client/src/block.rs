@@ -27,4 +27,3 @@ pub fn new_block(
         ..default()
     }
 }
-
