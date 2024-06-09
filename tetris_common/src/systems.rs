@@ -4,7 +4,10 @@ use crate::components::{Block, Board, ControlledShape, CurrentBoard, Shape};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 
 pub fn setup_board(mut command: Commands) {
-    command.spawn((CurrentBoard, Board));
+    command.spawn((CurrentBoard, Board {
+        width: 20,
+        height: 10,
+    }));
 }
 
 pub fn collision_check(
@@ -56,7 +59,7 @@ mod tests {
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
-        commands.spawn((CurrentBoard, Board))
+        commands.spawn((CurrentBoard, Board::default()))
             .with_children(|parent| {
                 parent.spawn(Block {
                     x: 10,
@@ -74,7 +77,7 @@ mod tests {
     }
 
     pub fn setup_board_collision(mut commands: Commands) {
-        commands.spawn((CurrentBoard, Board))
+        commands.spawn((CurrentBoard, Board::default()))
             .with_children(|parent| {
                 parent.spawn(Block {
                     x: 10,
