@@ -1,24 +1,25 @@
 use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Bundle, Color, default, Sprite, SpriteBundle, Transform};
-use crate::pos::Pos;
+
+use crate::board::{BoardCalculator, BoardPoint};
 
 #[derive(Bundle)]
 pub struct BoardWallsBundle {
-    position: Pos,
+    position: BoardPoint,
     pub sprite_bundle: SpriteBundle,
 }
 
 
 impl BoardWallsBundle {
     pub fn bottom_wall(
-        pos: Pos,
-        block_size: f32,
-        wall_size: f32,
+        pos: BoardPoint,
+        board_calculator: &BoardCalculator,
+        wall_size: i32,
         wall_width: f32,
     ) -> Self {
         let sprite_bundle = get_wall_sprite_bundle(
-            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
-            Vec2 { x: wall_size * block_size, y: wall_width },
+            board_calculator.window_relative_position(&pos),
+            Vec2 { x: board_calculator.window_relative_size(wall_size), y: wall_width },
         );
 
         Self {
@@ -27,14 +28,14 @@ impl BoardWallsBundle {
         }
     }
     pub fn top_wall(
-        pos: Pos,
-        block_size: f32,
-        wall_size: f32,
+        pos: BoardPoint,
+        board_calculator: &BoardCalculator,
+        wall_size: i32,
         wall_width: f32,
     ) -> Self {
         let sprite_bundle = get_wall_sprite_bundle(
-            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
-            Vec2 { x: wall_size * block_size, y: wall_width },
+            board_calculator.window_relative_position(&pos),
+            Vec2 { x: board_calculator.window_relative_size(wall_size), y: wall_width },
         );
 
         Self {
@@ -44,14 +45,14 @@ impl BoardWallsBundle {
     }
 
     pub fn left_wall(
-        pos: Pos,
-        block_size: f32,
-        wall_size: f32,
+        pos: BoardPoint,
+        board_calculator: &BoardCalculator,
+        wall_size: i32,
         wall_width: f32,
     ) -> Self {
         let sprite_bundle = get_wall_sprite_bundle(
-            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
-            Vec2 { x: wall_width, y: wall_size * block_size },
+            board_calculator.window_relative_position(&pos),
+            Vec2 { x: wall_width, y: board_calculator.window_relative_size(wall_size) },
         );
 
         Self {
@@ -61,14 +62,14 @@ impl BoardWallsBundle {
     }
 
     pub fn right_wall(
-        pos: Pos,
-        block_size: f32,
-        wall_size: f32,
+        pos: BoardPoint,
+        board_calculator: &BoardCalculator,
+        wall_size: i32,
         wall_width: f32,
     ) -> Self {
         let sprite_bundle = get_wall_sprite_bundle(
-            Vec2 { x: pos.0 * block_size, y: pos.1 * block_size },
-            Vec2 { x: wall_width, y: wall_size * block_size },
+            board_calculator.window_relative_position(&pos),
+            Vec2 { x: wall_width, y: board_calculator.window_relative_size(wall_size) },
         );
 
         Self {

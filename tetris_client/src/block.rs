@@ -2,12 +2,12 @@ use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Bundle, Color, Component, default, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
-use crate::pos::Pos;
+use crate::board::{BoardCalculator, BoardPoint};
 
 #[derive(Bundle)]
 pub struct BlockBundle {
     id: BlockId,
-    position: Pos,
+    position: BoardPoint,
     pub sprite_bundle: SpriteBundle,
 }
 
@@ -16,7 +16,8 @@ pub struct BlockId;
 
 impl BlockBundle {
     pub fn new(
-        pos: Pos,
+        board_calculator: &BoardCalculator,
+        board_position: BoardPoint,
         color: Color,
         block_size: f32,
     ) -> Self {
@@ -30,7 +31,7 @@ impl BlockBundle {
                 ..default()
             },
             transform: Transform {
-                translation: Vec3::new(pos.0 * block_size, pos.1 * block_size, 0.),
+                translation: board_calculator.window_relative_position(&board_position).extend(0.),
                 scale: Vec3::splat(1.),
                 ..default()
             },
@@ -39,7 +40,7 @@ impl BlockBundle {
 
         Self {
             id: BlockId,
-            position: pos,
+            position: board_position,
             sprite_bundle,
         }
     }
