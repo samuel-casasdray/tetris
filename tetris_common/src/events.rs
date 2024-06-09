@@ -1,7 +1,7 @@
-use bevy::prelude::{Entity, Event};
+use bevy::prelude::Event;
 
 #[derive(Event)]
 pub struct BlockCollisionEvent;
 
 #[derive(Event)]
-pub struct WallCollisionEvent(Entity);
+pub struct WallCollisionEvent;
