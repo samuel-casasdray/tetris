@@ -1,5 +1,5 @@
 use bevy::math::{Vec2, Vec3};
-use bevy::prelude::{Bundle, Color, Component, default, Sprite, SpriteBundle, Transform};
+use bevy::prelude::{default, Bundle, Color, Component, Sprite, SpriteBundle, Transform};
 
 #[derive(Bundle)]
 pub struct BoardWallsBundle {
@@ -15,17 +15,9 @@ pub enum BoardWall {
     Right,
 }
 
-
 impl BoardWallsBundle {
-    pub fn new(
-        pos: Vec2,
-        size: Vec2,
-        wall_id: BoardWall,
-    ) -> Self {
-        let sprite_bundle = get_wall_sprite_bundle(
-            pos,
-            size,
-        );
+    pub fn new(pos: Vec2, size: Vec2, wall_id: BoardWall) -> Self {
+        let sprite_bundle = get_wall_sprite_bundle(pos, size);
 
         Self {
             board_wall: wall_id,
@@ -34,10 +26,7 @@ impl BoardWallsBundle {
     }
 }
 
-fn get_wall_sprite_bundle(
-    position: Vec2,
-    size: Vec2,
-) -> SpriteBundle {
+fn get_wall_sprite_bundle(position: Vec2, size: Vec2) -> SpriteBundle {
     SpriteBundle {
         sprite: Sprite {
             color: Color::WHITE,

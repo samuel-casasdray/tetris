@@ -5,8 +5,8 @@ use crate::systems::{collision_check, setup_board};
 
 pub mod components;
 pub mod events;
-pub mod systems;
 mod shapes;
+pub mod systems;
 
 pub struct CommonPlugin;
 

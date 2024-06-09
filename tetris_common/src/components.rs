@@ -25,7 +25,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn get_blocks(&self) ->[Block; 4] {
+    pub fn get_blocks(&self) -> [Block; 4] {
         self.shape.get_blocks(self.rotation)
     }
 
@@ -51,11 +51,8 @@ impl Tetromino {
             5 => Shape::J,
             _ => Shape::L,
         };
-        
-        Self{
-            rotation: 0,
-            shape,
-        }
+
+        Self { rotation: 0, shape }
     }
 }
 
@@ -75,10 +72,7 @@ pub struct Block {
 
 impl From<(i32, i32)> for Block {
     fn from((x, y): (i32, i32)) -> Self {
-        Self {
-            x,
-            y,
-        }
+        Self { x, y }
     }
 }
 
@@ -91,9 +85,6 @@ pub struct GridPosition {
 
 impl From<(i32, i32)> for GridPosition {
     fn from((x, y): (i32, i32)) -> Self {
-        Self {
-            x,
-            y,
-        }
+        Self { x, y }
     }
 }

@@ -24,7 +24,7 @@ pub fn collision_check(
                 ev_wall_collision.send(WallCollisionEvent);
                 return;
             }
-            (x, _)  if x >= board.width as i32 || x < 0 => {
+            (x, _) if x >= board.width as i32 || x < 0 => {
                 ev_wall_collision.send(WallCollisionEvent);
                 return;
             }
@@ -78,49 +78,42 @@ mod tests {
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
-        commands.spawn((Owned, Board::default()))
+        commands
+            .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn(Block {
-                    x: 10,
-                    y: 10,
-                });
+                parent.spawn(Block { x: 10, y: 10 });
             });
 
-        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
-            parent.spawn(Block {
-                x: 11,
-                y: 10,
+        commands
+            .spawn((Fake, Tetromino::get_random_shape()))
+            .with_children(|parent| {
+                parent.spawn(Block { x: 11, y: 10 });
             });
-        });
         commands.insert_resource(ShouldCollide(true))
     }
 
     pub fn setup_board_block_collision(mut commands: Commands) {
-        commands.spawn((Owned, Board::default()))
+        commands
+            .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn(Block {
-                    x: 10,
-                    y: 10,
-                });
+                parent.spawn(Block { x: 10, y: 10 });
             });
 
-        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
-            parent.spawn(Block {
-                x: 11,
-                y: 10,
+        commands
+            .spawn((Fake, Tetromino::get_random_shape()))
+            .with_children(|parent| {
+                parent.spawn(Block { x: 11, y: 10 });
             });
-        });
         commands.insert_resource(ShouldCollide(true))
     }
 
     pub fn setup_board_wall_collision(mut commands: Commands) {
         commands.spawn((Owned, Board::default()));
-        commands.spawn((Fake, Tetromino::get_random_shape())).with_children(|parent| {
-            parent.spawn(Block {
-                x: -1,
-                y: 10,
+        commands
+            .spawn((Fake, Tetromino::get_random_shape()))
+            .with_children(|parent| {
+                parent.spawn(Block { x: -1, y: 10 });
             });
-        });
         commands.insert_resource(ShouldCollide(true))
     }
 
@@ -129,7 +122,15 @@ mod tests {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
-            .add_systems(Startup, (setup_board_no_collision, collision_check, test_checker_collision).chain())
+            .add_systems(
+                Startup,
+                (
+                    setup_board_no_collision,
+                    collision_check,
+                    test_checker_collision,
+                )
+                    .chain(),
+            )
             .run()
     }
 
@@ -138,7 +139,15 @@ mod tests {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
-            .add_systems(Startup, (setup_board_block_collision, collision_check, test_checker_collision).chain())
+            .add_systems(
+                Startup,
+                (
+                    setup_board_block_collision,
+                    collision_check,
+                    test_checker_collision,
+                )
+                    .chain(),
+            )
             .run()
     }
 
@@ -147,7 +156,15 @@ mod tests {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
-            .add_systems(Startup, (setup_board_no_collision, collision_check, test_checker_collision).chain())
+            .add_systems(
+                Startup,
+                (
+                    setup_board_no_collision,
+                    collision_check,
+                    test_checker_collision,
+                )
+                    .chain(),
+            )
             .run()
     }
 
@@ -156,7 +173,15 @@ mod tests {
         App::new()
             .add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
-            .add_systems(Startup, (setup_board_wall_collision, collision_check, test_checker_collision).chain())
+            .add_systems(
+                Startup,
+                (
+                    setup_board_wall_collision,
+                    collision_check,
+                    test_checker_collision,
+                )
+                    .chain(),
+            )
             .run()
     }
 }

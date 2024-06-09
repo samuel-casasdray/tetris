@@ -1,5 +1,5 @@
 use bevy::math::{Vec2, Vec3};
-use bevy::prelude::{Color, default, Sprite, Transform};
+use bevy::prelude::{default, Color, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
 use tetris_common::components::GridPosition;
@@ -15,14 +15,14 @@ pub fn new_block(
     SpriteBundle {
         sprite: Sprite {
             color,
-            custom_size: Some(
-                Vec2::new(block_size, block_size)
-            ),
+            custom_size: Some(Vec2::new(block_size, block_size)),
             anchor: bevy::sprite::Anchor::BottomLeft,
             ..default()
         },
         transform: Transform {
-            translation: board_calculator.window_relative_position(&block_position).extend(0.),
+            translation: board_calculator
+                .window_relative_position(&block_position)
+                .extend(0.),
             scale: Vec3::splat(1.),
             ..default()
         },

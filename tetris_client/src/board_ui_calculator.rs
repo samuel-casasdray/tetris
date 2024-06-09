@@ -26,7 +26,11 @@ impl BoardUICalculator {
         }
     }
     pub fn window_relative_position(&self, board_point: &GridPosition) -> Vec2 {
-        self.board_position + Vec2::new(board_point.x as f32 * self.block_size, board_point.y as f32 * self.block_size)
+        self.board_position
+            + Vec2::new(
+                board_point.x as f32 * self.block_size,
+                board_point.y as f32 * self.block_size,
+            )
     }
 
     pub fn window_relative_size(&self, board_relative_size: i32) -> f32 {
@@ -39,25 +43,43 @@ impl BoardUICalculator {
 
         let wall_width = self.window_relative_size(self.board_width as i32 + 2);
 
-        let top_pos = self.window_relative_position(&GridPosition{x:-1, y:self.board_height as i32});
-        let top_size = Vec2 { x: wall_width, y: wall_stroke };
+        let top_pos = self.window_relative_position(&GridPosition {
+            x: -1,
+            y: self.board_height as i32,
+        });
+        let top_size = Vec2 {
+            x: wall_width,
+            y: wall_stroke,
+        };
 
-        let bottom_pos = self.window_relative_position(&GridPosition{x:-1, y:-1});
-        let bottom_size = Vec2 { x: wall_width, y: wall_stroke };
+        let bottom_pos = self.window_relative_position(&GridPosition { x: -1, y: -1 });
+        let bottom_size = Vec2 {
+            x: wall_width,
+            y: wall_stroke,
+        };
 
         let wall_height = self.window_relative_size(self.board_height as i32);
 
-        let left_pos = self.window_relative_position(&GridPosition{x:-1, y:0});
-        let left_size = Vec2 { x: wall_stroke, y: wall_height };
+        let left_pos = self.window_relative_position(&GridPosition { x: -1, y: 0 });
+        let left_size = Vec2 {
+            x: wall_stroke,
+            y: wall_height,
+        };
 
-        let right_pos = self.window_relative_position(&GridPosition{x:self.board_width as i32, y:0});
-        let right_size = Vec2 { x: wall_stroke, y: wall_height };
+        let right_pos = self.window_relative_position(&GridPosition {
+            x: self.board_width as i32,
+            y: 0,
+        });
+        let right_size = Vec2 {
+            x: wall_stroke,
+            y: wall_height,
+        };
 
         [
             (top_pos, top_size),
             (bottom_pos, bottom_size),
             (left_pos, left_size),
-            (right_pos, right_size)
+            (right_pos, right_size),
         ]
     }
 }
