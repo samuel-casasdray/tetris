@@ -1,19 +1,19 @@
 use bevy::prelude::{Children, Commands, EventWriter, Query, With};
 
-use crate::components::{Block, Board, ControlledShape, CurrentBoard, Shape};
+use crate::components::{Block, Board, Owned, Shape, Fake};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 
 pub fn setup_board(mut command: Commands) {
-    command.spawn((CurrentBoard, Board {
+    command.spawn((Owned, Board {
         width: 20,
         height: 10,
     }));
 }
 
 pub fn collision_check(
-    current_board_children: Query<&Children, With<CurrentBoard>>,
-    current_board: Query<&Board, With<CurrentBoard>>,
-    controlled_shape: Query<(&Shape, &Children), With<ControlledShape>>,
+    current_board_children: Query<&Children, With<Owned>>,
+    current_board: Query<&Board, With<Owned>>,
+    controlled_shape: Query<(&Shape, &Children), With<Fake>>,
     blocks: Query<&Block>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut ev_wall_collision: EventWriter<WallCollisionEvent>,
@@ -27,8 +27,14 @@ pub fn collision_check(
     for shape_block in blocks.iter_many(controlled_shape_entities) {
         // Check collision with walls
         match (shape_block.x, shape_block.y) {
-            (_, 0) | (0, _) => { ev_wall_collision.send(WallCollisionEvent); }
-            (x, _)  if x >= board.width => { ev_wall_collision.send(WallCollisionEvent); }
+            (_, y) if y < 0 => {
+                ev_wall_collision.send(WallCollisionEvent);
+                return;
+            }
+            (x, _)  if x >= board.width as i32 || x < 0 => {
+                ev_wall_collision.send(WallCollisionEvent);
+                return;
+            }
             _ => {}
         };
     }
@@ -52,7 +58,7 @@ mod tests {
     use bevy::app::{App, Startup};
     use bevy::prelude::{BuildChildren, Commands, EventReader, IntoSystemConfigs, Res, Resource};
 
-    use crate::components::{Block, Board, ControlledShape, CurrentBoard, Shape};
+    use crate::components::{Block, Board, Owned, Shape, Fake};
     use crate::events::{BlockCollisionEvent, WallCollisionEvent};
     use crate::systems::collision_check;
 
@@ -79,7 +85,7 @@ mod tests {
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
-        commands.spawn((CurrentBoard, Board::default()))
+        commands.spawn((Owned, Board::default()))
             .with_children(|parent| {
                 parent.spawn(Block {
                     x: 10,
@@ -87,7 +93,7 @@ mod tests {
                 });
             });
 
-        commands.spawn((ControlledShape, Shape)).with_children(|parent| {
+        commands.spawn((Fake, Shape)).with_children(|parent| {
             parent.spawn(Block {
                 x: 11,
                 y: 10,
@@ -97,7 +103,7 @@ mod tests {
     }
 
     pub fn setup_board_block_collision(mut commands: Commands) {
-        commands.spawn((CurrentBoard, Board::default()))
+        commands.spawn((Owned, Board::default()))
             .with_children(|parent| {
                 parent.spawn(Block {
                     x: 10,
@@ -105,7 +111,7 @@ mod tests {
                 });
             });
 
-        commands.spawn((ControlledShape, Shape)).with_children(|parent| {
+        commands.spawn((Fake, Shape)).with_children(|parent| {
             parent.spawn(Block {
                 x: 11,
                 y: 10,
@@ -115,10 +121,10 @@ mod tests {
     }
 
     pub fn setup_board_wall_collision(mut commands: Commands) {
-        commands.spawn((CurrentBoard, Board::default()));
-        commands.spawn((ControlledShape, Shape)).with_children(|parent| {
+        commands.spawn((Owned, Board::default()));
+        commands.spawn((Fake, Shape)).with_children(|parent| {
             parent.spawn(Block {
-                x: 0,
+                x: -1,
                 y: 10,
             });
         });

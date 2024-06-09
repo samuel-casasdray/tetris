@@ -16,16 +16,18 @@ impl Default for Board {
 }
 
 #[derive(Component)]
-pub struct CurrentBoard;
-
-#[derive(Component)]
 pub struct Shape;
 
+/// An entity controlled by the user running the app
 #[derive(Component)]
-pub struct ControlledShape;
+pub struct Owned;
+
+/// Particularly used to create a fake shape to test collision against 
+#[derive(Component)]
+pub struct Fake;
 
 #[derive(Component)]
 pub struct Block {
-    pub x: usize,
-    pub y: usize,
+    pub x: i32,
+    pub y: i32,
 }
