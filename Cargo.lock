@@ -3104,6 +3104,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "term_grid"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7c9eb7705cb3f0fd71d3955b23db6d372142ac139e8c473952c93bf3c3dc4b7"
+dependencies = [
+ "unicode-width",
+]
+
+[[package]]
 name = "termcolor"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3126,6 +3135,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "rand",
+ "term_grid",
 ]
 
 [[package]]

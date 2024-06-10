@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 bevy = { workspace = true }
 rand = { workspace = true }
+
+[dev-dependencies]
+term_grid = "0.2.0"
