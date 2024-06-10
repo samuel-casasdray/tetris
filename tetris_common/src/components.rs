@@ -25,7 +25,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn get_blocks(&self) -> [Block; 4] {
+    pub fn get_blocks_positions(&self) -> [GridPosition; 4] {
         self.shape.get_blocks(self.rotation)
     }
 
@@ -65,16 +65,7 @@ pub struct Owned;
 pub struct Fake;
 
 #[derive(Component)]
-pub struct Block {
-    pub x: i32,
-    pub y: i32,
-}
-
-impl From<(i32, i32)> for Block {
-    fn from((x, y): (i32, i32)) -> Self {
-        Self { x, y }
-    }
-}
+pub struct Block;
 
 /// A position inside the tetris board grid
 #[derive(Component, Clone)]

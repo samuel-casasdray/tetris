@@ -1,13 +1,13 @@
 use bevy::prelude::{Children, EventWriter, Query, With};
 
-use crate::components::{Block, Board, Fake, Owned, Tetromino};
+use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 
 pub fn collision_check(
     current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
     controlled_shape: Query<(&Tetromino, &Children), With<Fake>>,
-    blocks: Query<&Block>,
+    blocks: Query<&GridPosition, With<Block>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut ev_wall_collision: EventWriter<WallCollisionEvent>,
 ) {
@@ -51,7 +51,7 @@ mod tests {
     use bevy::app::{App, Startup};
     use bevy::prelude::{BuildChildren, Commands, EventReader, IntoSystemConfigs, Res, Resource};
 
-    use crate::components::{Block, Board, Fake, Owned, Tetromino};
+    use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
     use crate::events::{BlockCollisionEvent, WallCollisionEvent};
     use crate::systems::collision_check;
 
@@ -81,13 +81,13 @@ mod tests {
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn(Block { x: 10, y: 10 });
+                parent.spawn((Block, GridPosition { x: 10, y: 10 }));
             });
 
         commands
             .spawn((Fake, Tetromino::get_random_shape()))
             .with_children(|parent| {
-                parent.spawn(Block { x: 11, y: 10 });
+                parent.spawn((Block, GridPosition { x: 11, y: 10 }));
             });
         commands.insert_resource(ShouldCollide(true))
     }
@@ -96,13 +96,13 @@ mod tests {
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn(Block { x: 10, y: 10 });
+                parent.spawn((Block, GridPosition { x: 10, y: 10 }));
             });
 
         commands
             .spawn((Fake, Tetromino::get_random_shape()))
             .with_children(|parent| {
-                parent.spawn(Block { x: 11, y: 10 });
+                parent.spawn((Block, GridPosition { x: 11, y: 10 }));
             });
         commands.insert_resource(ShouldCollide(true))
     }
@@ -112,7 +112,7 @@ mod tests {
         commands
             .spawn((Fake, Tetromino::get_random_shape()))
             .with_children(|parent| {
-                parent.spawn(Block { x: -1, y: 10 });
+                parent.spawn((Block, GridPosition { x: -1, y: 10 }));
             });
         commands.insert_resource(ShouldCollide(true))
     }

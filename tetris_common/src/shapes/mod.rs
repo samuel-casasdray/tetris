@@ -1,4 +1,4 @@
-use crate::components::Block;
+use crate::components::GridPosition;
 use crate::shapes::shape_i::{shape_i1, shape_i2, shape_i3, shape_i4};
 use crate::shapes::shape_j::{shape_j1, shape_j2, shape_j3, shape_j4};
 use crate::shapes::shape_l::{shape_l1, shape_l2, shape_l3, shape_l4};
@@ -26,7 +26,7 @@ pub enum Shape {
 }
 
 impl Shape {
-    pub fn get_blocks(&self, mut rotation: u8) -> [Block; 4] {
+    pub fn get_blocks(&self, mut rotation: u8) -> [GridPosition; 4] {
         rotation %= 4;
 
         match self {

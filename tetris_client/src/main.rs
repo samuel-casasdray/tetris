@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 use bevy::window::WindowResized;
 
-use tetris_common::components::{Block, GridPosition};
 use tetris_common::CommonPlugin;
+use tetris_common::components::{Block, GridPosition};
 
-use crate::board_ui_calculator::{BoardUICalculator, get_window_position, MAX_BOARD_WIDTH_PERCENT, MAX_BOARD_HEIGHT_PERCENT, DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT};
+use crate::board_ui_calculator::{
+    BoardUICalculator, DEFAULT_BOARD_HEIGHT, DEFAULT_BOARD_WIDTH, get_window_position,
+    MAX_BOARD_HEIGHT_PERCENT, MAX_BOARD_WIDTH_PERCENT,
+};
 use crate::board_walls::{BoardWall, BoardWallsBundle};
 
 mod block;
@@ -22,7 +25,7 @@ fn main() {
 
 fn setup_sprites(
     mut commands: Commands,
-    blocks: Query<(Entity, &Block), Without<Sprite>>,
+    blocks: Query<(Entity, &GridPosition), (With<Block>, Without<Sprite>)>,
     board_calculator: Res<BoardUICalculator>,
 ) {
     let colors = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
@@ -43,7 +46,7 @@ fn on_resize_system(
     mut camera2d_bundle: Query<&mut Transform, With<Camera>>,
     mut resize_reader: EventReader<WindowResized>,
     mut board_calculator: ResMut<BoardUICalculator>,
-    mut blocks: Query<(&mut Transform, &Block), Without<Camera>>,
+    mut blocks: Query<(&mut Transform, &GridPosition), (With<Block>, Without<Camera>)>,
     mut walls: Query<(&mut Transform, &BoardWall), (Without<Camera>, Without<Block>)>,
 ) {
     for window in resize_reader.read() {
@@ -59,25 +62,29 @@ fn on_resize_system(
         );
         for mut block in blocks.iter_mut() {
             let new_scale = block.0.scale.x * board_calculator.block_size / old_block_size;
-            *block.0 = block.0
+            *block.0 = block
+                .0
                 .with_scale(Vec3::new(new_scale, new_scale, new_scale))
                 .with_translation(
                     board_calculator
-                        .window_relative_position(&GridPosition { x: block.1.x, y: block.1.y })
-                        .extend(0.)
+                        .window_relative_position(&GridPosition {
+                            x: block.1.x,
+                            y: block.1.y,
+                        })
+                        .extend(0.),
                 )
         }
         let walls_size = board_calculator.window_relative_board_walls();
         for mut wall in walls.iter_mut().zip(walls_size) {
-            *wall.0.0 = wall.0.0
-                .with_scale(
-                    Vec3::new(
-                        wall.0.0.scale.x * board_calculator.block_size / old_block_size,
-                        wall.0.0.scale.y * board_calculator.block_size / old_block_size,
-                        1.,
-                    )
-                )
-                .with_translation(wall.1.0.extend(0.))
+            *wall.0 .0 = wall
+                .0
+                 .0
+                .with_scale(Vec3::new(
+                    wall.0 .0.scale.x * board_calculator.block_size / old_block_size,
+                    wall.0 .0.scale.y * board_calculator.block_size / old_block_size,
+                    1.,
+                ))
+                .with_translation(wall.1 .0.extend(0.))
         }
     }
 }
@@ -125,7 +132,7 @@ fn setup_walls(mut commands: Commands, board_cal: Res<BoardUICalculator>) {
     ];
 
     for wall in walls.iter().zip(walls_order) {
-        let wall_bundle = BoardWallsBundle::new(wall.0.0, wall.0.1, wall.1);
+        let wall_bundle = BoardWallsBundle::new(wall.0 .0, wall.0 .1, wall.1);
         commands.spawn(wall_bundle);
     }
 }

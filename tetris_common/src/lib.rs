@@ -55,7 +55,8 @@ mod tests {
                 commands
                     .spawn((
                         Owned,
-                        Block {
+                        Block,
+                        GridPosition {
                             x: x as i32,
                             y: y as i32,
                         },
@@ -69,8 +70,7 @@ mod tests {
     }
 
     fn draw_system(
-        mut commands: Commands,
-        blocks: Query<&Block, With<Owned>>,
+        blocks: Query<&GridPosition, (With<Owned>, With<Block>)>,
         board: Query<&Board, With<Owned>>,
     ) {
         let board = board.single();
@@ -93,8 +93,9 @@ mod tests {
             grid.add(Cell::from(s));
         }
 
-        println!("{}", "--------------------");
+        let separator = "-".repeat(board.width * 2);
+        println!("{}", separator);
         println!("{}", grid.fit_into_columns(board.width));
-        println!("{}", "--------------------");
+        println!("{}", separator);
     }
 }

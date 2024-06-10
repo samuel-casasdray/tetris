@@ -1,6 +1,6 @@
 use bevy::prelude::{BuildChildren, Commands, Entity, SpatialBundle};
 
-use crate::components::{Block, Board, Owned};
+use crate::components::{Block, Board, GridPosition, Owned};
 
 pub fn setup_board(mut commands: Commands) {
     let board_entity = commands
@@ -13,7 +13,8 @@ pub fn setup_board(mut commands: Commands) {
             commands
                 .spawn((
                     Owned,
-                    Block {
+                    Block,
+                    GridPosition {
                         x: x as i32,
                         y: y as i32,
                     },
