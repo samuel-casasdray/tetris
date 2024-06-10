@@ -37,11 +37,19 @@ mod tests {
     }
 
     fn setup_tetromino(mut commands: Commands) {
-        commands.spawn((
-            Owned,
-            Tetromino::get_random_shape(),
-            GridPosition { x: 5, y: 10 },
-        ));
+        let tetromino = Tetromino::get_random_shape();
+        let positions = tetromino.get_blocks_positions().map(|mut position| {
+            position.x += 5;
+            position.y += 10;
+            position
+        });
+        commands
+            .spawn((Owned, tetromino, GridPosition { x: 5, y: 10 }))
+            .with_children(|child| {
+                for position in positions {
+                    child.spawn((Owned, Block, position));
+                }
+            });
     }
 
     fn setup_block(mut commands: Commands) {
