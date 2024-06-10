@@ -8,7 +8,7 @@ pub fn setup_board(mut commands: Commands) {
         .id();
 
     let block_entities: Vec<Entity> = (0usize..10usize)
-        .zip(0usize..20usize)
+        .flat_map(|x| (0usize..20usize).map(move |y| (x, y)))
         .map(|(x, y)| {
             commands
                 .spawn((
