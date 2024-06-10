@@ -1,7 +1,7 @@
 use bevy::prelude::{App, Plugin, Startup, Update};
 
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
-use crate::systems::{collision_check, setup_board};
+use crate::systems::{collision_check, relative_position_system, setup_board};
 
 pub mod components;
 pub mod events;
@@ -15,7 +15,7 @@ impl Plugin for CommonPlugin {
         app.add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
             .add_systems(Startup, setup_board)
-            .add_systems(Update, collision_check);
+            .add_systems(Update, (relative_position_system, collision_check));
     }
 }
 
@@ -23,31 +23,51 @@ impl Plugin for CommonPlugin {
 mod tests {
     use bevy::app::{App, Startup};
     use bevy::prelude::{
-        BuildChildren, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, With,
+        BuildChildren, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Update, With,
     };
     use term_grid::{Cell, Direction, Filling, Grid, GridOptions};
 
     use crate::components::{Block, Board, GridPosition, Owned, Tetromino};
+    use crate::systems::{relative_position_system, tetromino_gravity_system};
 
     #[test]
     fn terminal_test() {
-        App::new()
-            .add_systems(Startup, (setup_block, setup_tetromino, draw_system).chain())
-            .run()
+        let mut app = App::new();
+
+        app.add_systems(Startup, (setup_block, setup_tetromino).chain())
+            .add_systems(
+                Update,
+                (
+                    relative_position_system,
+                    tetromino_gravity_system,
+                    draw_system,
+                )
+                    .chain(),
+            );
+
+        app.update();
+        app.update();
+        app.update();
+        app.update();
+        app.update();
+        app.update();
+        app.update();
+        app.update();
     }
 
     fn setup_tetromino(mut commands: Commands) {
         let tetromino = Tetromino::get_random_shape();
-        let positions = tetromino.get_blocks_positions().map(|mut position| {
-            position.x += 5;
-            position.y += 10;
-            position
-        });
+        let positions = tetromino.get_blocks_positions();
         commands
             .spawn((Owned, tetromino, GridPosition { x: 5, y: 10 }))
             .with_children(|child| {
-                for position in positions {
-                    child.spawn((Owned, Block, position));
+                for relative_positions in positions {
+                    child.spawn((
+                        Owned,
+                        Block,
+                        relative_positions,
+                        GridPosition { x: 0, y: 0 },
+                    ));
                 }
             });
     }

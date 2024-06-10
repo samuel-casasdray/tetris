@@ -25,7 +25,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn get_blocks_positions(&self) -> [GridPosition; 4] {
+    pub fn get_blocks_positions(&self) -> [RelativeGridPosition; 4] {
         self.shape.get_blocks(self.rotation)
     }
 
@@ -73,8 +73,18 @@ pub struct GridPosition {
     pub x: i32,
     pub y: i32,
 }
-
 impl From<(i32, i32)> for GridPosition {
+    fn from((x, y): (i32, i32)) -> Self {
+        Self { x, y }
+    }
+}
+
+#[derive(Component, Clone)]
+pub struct RelativeGridPosition {
+    pub x: i32,
+    pub y: i32,
+}
+impl From<(i32, i32)> for RelativeGridPosition {
     fn from((x, y): (i32, i32)) -> Self {
         Self { x, y }
     }
