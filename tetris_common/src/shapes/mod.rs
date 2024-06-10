@@ -1,4 +1,19 @@
 use crate::components::Block;
+use crate::shapes::shape_i::{shape_i1, shape_i2, shape_i3, shape_i4};
+use crate::shapes::shape_j::{shape_j1, shape_j2, shape_j3, shape_j4};
+use crate::shapes::shape_l::{shape_l1, shape_l2, shape_l3, shape_l4};
+use crate::shapes::shape_o::shape_o;
+use crate::shapes::shape_s::{shape_s1, shape_s2, shape_s3, shape_s4};
+use crate::shapes::shape_t::{shape_t1, shape_t2, shape_t3, shape_t4};
+use crate::shapes::shape_z::{shape_z1, shape_z2, shape_z3, shape_z4};
+
+mod shape_i;
+mod shape_j;
+mod shape_l;
+mod shape_o;
+mod shape_s;
+mod shape_t;
+mod shape_z;
 
 pub enum Shape {
     I,
@@ -54,110 +69,4 @@ impl Shape {
             },
         }
     }
-}
-
-// I
-pub fn shape_i1() -> [Block; 4] {
-    [(0, 2).into(), (1, 2).into(), (2, 2).into(), (3, 2).into()]
-}
-
-pub fn shape_i2() -> [Block; 4] {
-    [(2, 0).into(), (2, 1).into(), (2, 2).into(), (2, 3).into()]
-}
-pub fn shape_i3() -> [Block; 4] {
-    [(0, 1).into(), (1, 1).into(), (2, 1).into(), (3, 1).into()]
-}
-pub fn shape_i4() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (1, 2).into(), (1, 3).into()]
-}
-// T
-
-pub fn shape_t1() -> [Block; 4] {
-    [(1, 0).into(), (0, 1).into(), (1, 1).into(), (2, 1).into()]
-}
-
-pub fn shape_t2() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (1, 2).into(), (0, 1).into()]
-}
-
-pub fn shape_t3() -> [Block; 4] {
-    [(0, 1).into(), (1, 1).into(), (2, 1).into(), (1, 2).into()]
-}
-
-pub fn shape_t4() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (1, 2).into(), (2, 1).into()]
-}
-
-// O
-pub fn shape_o() -> [Block; 4] {
-    [(0, 0).into(), (1, 0).into(), (0, 1).into(), (1, 1).into()]
-}
-
-// S
-pub fn shape_s1() -> [Block; 4] {
-    [(1, 0).into(), (2, 0).into(), (0, 1).into(), (1, 1).into()]
-}
-
-pub fn shape_s2() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (2, 1).into(), (2, 2).into()]
-}
-
-pub fn shape_s3() -> [Block; 4] {
-    [(1, 1).into(), (2, 1).into(), (0, 2).into(), (1, 2).into()]
-}
-
-pub fn shape_s4() -> [Block; 4] {
-    [(0, 0).into(), (0, 1).into(), (1, 1).into(), (1, 2).into()]
-}
-
-// Z
-pub fn shape_z1() -> [Block; 4] {
-    [(0, 0).into(), (1, 0).into(), (1, 1).into(), (2, 1).into()]
-}
-
-pub fn shape_z2() -> [Block; 4] {
-    [(2, 0).into(), (1, 1).into(), (2, 1).into(), (1, 2).into()]
-}
-
-pub fn shape_z3() -> [Block; 4] {
-    [(0, 1).into(), (1, 1).into(), (1, 2).into(), (2, 2).into()]
-}
-
-pub fn shape_z4() -> [Block; 4] {
-    [(1, 0).into(), (0, 1).into(), (1, 1).into(), (0, 2).into()]
-}
-
-// J
-pub fn shape_j1() -> [Block; 4] {
-    [(0, 0).into(), (0, 1).into(), (1, 1).into(), (2, 1).into()]
-}
-
-pub fn shape_j2() -> [Block; 4] {
-    [(1, 0).into(), (2, 0).into(), (1, 1).into(), (1, 2).into()]
-}
-
-pub fn shape_j3() -> [Block; 4] {
-    [(0, 1).into(), (1, 1).into(), (2, 1).into(), (2, 2).into()]
-}
-
-pub fn shape_j4() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (0, 2).into(), (1, 2).into()]
-}
-
-// L
-
-pub fn shape_l1() -> [Block; 4] {
-    [(2, 0).into(), (0, 1).into(), (1, 1).into(), (2, 1).into()]
-}
-
-pub fn shape_l2() -> [Block; 4] {
-    [(1, 0).into(), (1, 1).into(), (1, 2).into(), (2, 2).into()]
-}
-
-pub fn shape_l3() -> [Block; 4] {
-    [(0, 1).into(), (1, 1).into(), (2, 1).into(), (0, 2).into()]
-}
-
-pub fn shape_l4() -> [Block; 4] {
-    [(0, 0).into(), (1, 0).into(), (1, 1).into(), (1, 2).into()]
 }
