@@ -4,11 +4,8 @@ use bevy::window::WindowResized;
 use tetris_common::components::{Block, GridPosition};
 use tetris_common::CommonPlugin;
 
-use crate::board_ui_calculator::BoardUICalculator;
+use crate::board_ui_calculator::{BoardUICalculator, get_window_position, MAX_BOARD_WIDTH_PERCENT, MAX_BOARD_HEIGHT_PERCENT, DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT};
 use crate::board_walls::{BoardWall, BoardWallsBundle};
-
-pub const DEFAULT_BOARD_WIDTH: usize = 10;
-pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 
 mod block;
 mod board_ui_calculator;
@@ -46,12 +43,14 @@ fn on_resize_system(
     mut camera2d_bundle: Query<&mut Transform, With<Camera>>,
     mut resize_reader: EventReader<WindowResized>,
     mut board_calculator: ResMut<BoardUICalculator>,
-    mut blocks: Query<&mut Transform, (With<Block>, Without<Camera>)>,
+    mut blocks: Query<(&mut Transform, &Block), Without<Camera>>,
+    mut walls: Query<(&mut Transform, &BoardWall), (Without<Camera>, Without<Block>)>,
 ) {
     for window in resize_reader.read() {
         camera2d_bundle.single_mut().translation =
             Vec3::new(window.width / 2., window.height / 2., 0.);
         let old_block_size = board_calculator.block_size;
+        board_calculator.set_window_position(window.width, window.height);
         board_calculator.block_size = get_block_size(
             window.width,
             window.height,
@@ -59,16 +58,33 @@ fn on_resize_system(
             board_calculator.board_height,
         );
         for mut block in blocks.iter_mut() {
-            let old_block_scale = block.scale.x;
-            let new_scale = old_block_scale * board_calculator.block_size / old_block_size;
-            *block = block.with_scale(Vec3::new(new_scale, new_scale, new_scale));
+            let new_scale = block.0.scale.x * board_calculator.block_size / old_block_size;
+            *block.0 = block.0
+                .with_scale(Vec3::new(new_scale, new_scale, new_scale))
+                .with_translation(
+                    board_calculator
+                        .window_relative_position(&GridPosition { x: block.1.x, y: block.1.y })
+                        .extend(0.)
+                )
+        }
+        let walls_size = board_calculator.window_relative_board_walls();
+        for mut wall in walls.iter_mut().zip(walls_size) {
+            *wall.0.0 = wall.0.0
+                .with_scale(
+                    Vec3::new(
+                        wall.0.0.scale.x * board_calculator.block_size / old_block_size,
+                        wall.0.0.scale.y * board_calculator.block_size / old_block_size,
+                        1.,
+                    )
+                )
+                .with_translation(wall.1.0.extend(0.))
         }
     }
 }
 
 fn get_block_size(width: f32, height: f32, board_width: usize, board_height: usize) -> f32 {
-    let width = width * 0.4;
-    let height = height * 0.9;
+    let width = width * MAX_BOARD_WIDTH_PERCENT;
+    let height = height * MAX_BOARD_HEIGHT_PERCENT;
     (width / board_width as f32).min(height / board_height as f32)
 }
 
@@ -80,10 +96,8 @@ fn setup_resources(mut commands: Commands, window: Query<&Window>) {
         DEFAULT_BOARD_WIDTH,
         DEFAULT_BOARD_HEIGHT,
     );
-    let x = (window.width() - block_size * (DEFAULT_BOARD_WIDTH + 2) as f32) / 2.;
-    let y = (window.height() - block_size * DEFAULT_BOARD_HEIGHT as f32) / 2.;
     let board_calculator = BoardUICalculator::new(
-        Vec2::new(x, y),
+        get_window_position(block_size, window.width(), window.height()),
         block_size,
         DEFAULT_BOARD_HEIGHT,
         DEFAULT_BOARD_WIDTH,
@@ -111,7 +125,7 @@ fn setup_walls(mut commands: Commands, board_cal: Res<BoardUICalculator>) {
     ];
 
     for wall in walls.iter().zip(walls_order) {
-        let wall_bundle = BoardWallsBundle::new(wall.0 .0, wall.0 .1, wall.1);
+        let wall_bundle = BoardWallsBundle::new(wall.0.0, wall.0.1, wall.1);
         commands.spawn(wall_bundle);
     }
 }

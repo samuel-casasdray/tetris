@@ -3,6 +3,12 @@ use bevy::prelude::Resource;
 
 use tetris_common::components::GridPosition;
 
+
+pub const DEFAULT_BOARD_WIDTH: usize = 10;
+pub const DEFAULT_BOARD_HEIGHT: usize = 20;
+pub const MAX_BOARD_WIDTH_PERCENT: f32 = 0.4;
+pub const MAX_BOARD_HEIGHT_PERCENT: f32 = 0.9;
+
 #[derive(Resource)]
 pub struct BoardUICalculator {
     pub board_position: Vec2,
@@ -82,4 +88,14 @@ impl BoardUICalculator {
             (right_pos, right_size),
         ]
     }
+    pub fn set_window_position(&mut self, width: f32, height: f32) -> Vec2 {
+        self.board_position = get_window_position(self.block_size, width, height);
+        self.board_position
+    }
+     
+}
+pub fn get_window_position(block_size: f32, width: f32, height: f32) -> Vec2 {
+    let x = (width - block_size * (DEFAULT_BOARD_WIDTH + 2) as f32) / 2.;
+    let y = (height - block_size * DEFAULT_BOARD_HEIGHT as f32) / 2.;
+    Vec2::new(x, y)
 }
