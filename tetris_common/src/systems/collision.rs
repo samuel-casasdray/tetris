@@ -1,13 +1,16 @@
-use bevy::prelude::{Children, EventWriter, Query, With};
+use bevy::prelude::{Children, EventWriter, Query, With, Without};
 
-use crate::components::{Block, Board, GridPosition, NextMove, Owned, Tetromino};
+use crate::components::{
+    Block, Board, GridPosition, NextMove, Owned, RelativeGridPosition, Tetromino,
+};
 use crate::events::BlockCollisionEvent;
 
 pub fn collision_resolver(
     current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
     controlled_shape: Query<(&Tetromino, &Children), With<Owned>>,
-    blocks: Query<&GridPosition, With<Block>>,
+    board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
+    shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
     mut next_move_q: Query<&mut NextMove, With<Owned>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
 ) {
@@ -19,7 +22,7 @@ pub fn collision_resolver(
     let mut next_move = next_move_q.single_mut();
 
     let board = current_board.single();
-    for shape_block in blocks.iter_many(controlled_shape_entities) {
+    for shape_block in shape_blocks_q.iter_many(controlled_shape_entities) {
         // Check collision with walls
         let next_x = shape_block.x + next_move.0.x;
         let next_y = shape_block.y + next_move.0.y;
@@ -38,10 +41,11 @@ pub fn collision_resolver(
 
     let children_result = current_board_children.get_single();
     if let Ok(children) = children_result {
-        for block in blocks.iter_many(children) {
-            for shape_blocks in blocks.iter_many(controlled_shape_entities) {
+        for block in board_blocks_q.iter_many(children) {
+            for shape_blocks in shape_blocks_q.iter_many(controlled_shape_entities) {
                 // Check collision with shapes block
                 if block.x == shape_blocks.x && block.y == shape_blocks.y {
+                    println!("COLLISION {:?} {:?}", block, shape_blocks);
                     ev_block_collision.send(BlockCollisionEvent);
                     return;
                 }

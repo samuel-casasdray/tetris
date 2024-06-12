@@ -12,7 +12,7 @@ pub fn setup_board(mut commands: Commands) {
         .id();
 
     commands.spawn(GravityTimer {
-        timer: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
+        timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
     });
 
     // let block_entities: Vec<Entity> = (0usize..10usize)

@@ -2,7 +2,7 @@ use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup};
 
 use crate::events::BlockCollisionEvent;
 use crate::systems::{
-    collision_resolver, relative_position_system, setup_board,
+    collision_resolver, relative_position_system, setup_board, tetromino_blocks_fixer,
     tetromino_gravity_system, tetromino_next_move_validator, tetromino_spawner,
 };
 
@@ -26,7 +26,7 @@ impl Plugin for CommonPlugin {
                         tetromino_gravity_system,
                         collision_resolver,
                         tetromino_next_move_validator,
-                        // tetromino_blocks_fixer,
+                        tetromino_blocks_fixer,
                     )
                         .chain(),
                 ),
