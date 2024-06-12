@@ -15,7 +15,7 @@ mod shape_s;
 mod shape_t;
 mod shape_z;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Shape {
     I,
     O,

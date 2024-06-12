@@ -3,7 +3,7 @@ use rand::Rng;
 
 use crate::shapes::Shape;
 
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct Board {
     pub height: usize,
     pub width: usize,
@@ -18,7 +18,7 @@ impl Default for Board {
     }
 }
 
-#[derive(Component, Clone)]
+#[derive(Debug, Component, Clone)]
 pub struct Tetromino {
     rotation: u8,
     shape: Shape,
@@ -57,18 +57,18 @@ impl Tetromino {
 }
 
 /// An entity controlled by the user running the app
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct Owned;
 
 /// Particularly used to create a fake shape to test collision against
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct Fake;
 
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct Block;
 
 /// A position inside the tetris board grid
-#[derive(Component, Clone)]
+#[derive(Debug, Component, Clone)]
 pub struct GridPosition {
     pub x: i32,
     pub y: i32,
@@ -79,7 +79,7 @@ impl From<(i32, i32)> for GridPosition {
     }
 }
 
-#[derive(Component, Clone)]
+#[derive(Debug, Component, Clone)]
 pub struct RelativeGridPosition {
     pub x: i32,
     pub y: i32,
@@ -90,7 +90,10 @@ impl From<(i32, i32)> for RelativeGridPosition {
     }
 }
 
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct GravityTimer {
     pub timer: Timer,
 }
+
+#[derive(Debug, Component)]
+pub struct NextMove(pub RelativeGridPosition);

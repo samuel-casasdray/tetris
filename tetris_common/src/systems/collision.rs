@@ -1,35 +1,39 @@
 use bevy::prelude::{Children, EventWriter, Query, With};
 
-use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
-use crate::events::{BlockCollisionEvent, WallCollisionEvent};
+use crate::components::{Block, Board, GridPosition, NextMove, Owned, Tetromino};
+use crate::events::BlockCollisionEvent;
 
-pub fn collision_check(
+pub fn collision_resolver(
     current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
-    controlled_shape: Query<(&Tetromino, &Children), (With<Fake>, With<Owned>)>,
+    controlled_shape: Query<(&Tetromino, &Children), With<Owned>>,
     blocks: Query<&GridPosition, With<Block>>,
+    mut next_move_q: Query<&mut NextMove, With<Owned>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
-    mut ev_wall_collision: EventWriter<WallCollisionEvent>,
 ) {
     let (_, controlled_shape_entities) = match controlled_shape.get_single() {
         Ok(query) => query,
         Err(_) => return,
     };
 
+    let mut next_move = next_move_q.single_mut();
+
     let board = current_board.single();
     for shape_block in blocks.iter_many(controlled_shape_entities) {
         // Check collision with walls
-        match (shape_block.x, shape_block.y) {
-            (_, y) if y < 0 => {
-                ev_wall_collision.send(WallCollisionEvent);
-                return;
-            }
-            (x, _) if x >= board.width as i32 || x < 0 => {
-                ev_wall_collision.send(WallCollisionEvent);
-                return;
-            }
-            _ => {}
-        };
+        let next_x = shape_block.x + next_move.0.x;
+        let next_y = shape_block.y + next_move.0.y;
+
+        if next_y < 0 {
+            next_move.0.y = 0;
+            ev_block_collision.send(BlockCollisionEvent);
+            return;
+        }
+
+        if next_x >= board.width as i32 || next_x < 0 {
+            next_move.0.x = 0;
+            return;
+        }
     }
 
     let children_result = current_board_children.get_single();
@@ -51,9 +55,10 @@ mod tests {
     use bevy::app::{App, Startup};
     use bevy::prelude::{BuildChildren, Commands, EventReader, IntoSystemConfigs, Res, Resource};
 
+    use crate::bundles::OwnedNextMoveBundle;
     use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
-    use crate::events::{BlockCollisionEvent, WallCollisionEvent};
-    use crate::systems::collision_check;
+    use crate::events::BlockCollisionEvent;
+    use crate::systems::collision_resolver;
 
     #[derive(Resource)]
     struct ShouldCollide(bool);
@@ -78,6 +83,7 @@ mod tests {
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
+        commands.spawn(OwnedNextMoveBundle::new());
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
@@ -93,6 +99,7 @@ mod tests {
     }
 
     pub fn setup_board_block_collision(mut commands: Commands) {
+        commands.spawn(OwnedNextMoveBundle::new());
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
@@ -107,26 +114,15 @@ mod tests {
         commands.insert_resource(ShouldCollide(true))
     }
 
-    pub fn setup_board_wall_collision(mut commands: Commands) {
-        commands.spawn((Owned, Board::default()));
-        commands
-            .spawn((Fake, Tetromino::get_random_shape()))
-            .with_children(|parent| {
-                parent.spawn((Block, GridPosition { x: -1, y: 10 }));
-            });
-        commands.insert_resource(ShouldCollide(true))
-    }
-
     #[test]
     fn block_no_collision_should_occur() {
         App::new()
             .add_event::<BlockCollisionEvent>()
-            .add_event::<WallCollisionEvent>()
             .add_systems(
                 Startup,
                 (
                     setup_board_no_collision,
-                    collision_check,
+                    collision_resolver,
                     test_checker_collision,
                 )
                     .chain(),
@@ -138,46 +134,11 @@ mod tests {
     fn block_collision_should_occur() {
         App::new()
             .add_event::<BlockCollisionEvent>()
-            .add_event::<WallCollisionEvent>()
             .add_systems(
                 Startup,
                 (
                     setup_board_block_collision,
-                    collision_check,
-                    test_checker_collision,
-                )
-                    .chain(),
-            )
-            .run()
-    }
-
-    #[test]
-    fn no_wall_collision_should_occur() {
-        App::new()
-            .add_event::<BlockCollisionEvent>()
-            .add_event::<WallCollisionEvent>()
-            .add_systems(
-                Startup,
-                (
-                    setup_board_no_collision,
-                    collision_check,
-                    test_checker_collision,
-                )
-                    .chain(),
-            )
-            .run()
-    }
-
-    #[test]
-    fn wall_collision_should_occur() {
-        App::new()
-            .add_event::<BlockCollisionEvent>()
-            .add_event::<WallCollisionEvent>()
-            .add_systems(
-                Startup,
-                (
-                    setup_board_wall_collision,
-                    collision_check,
+                    collision_resolver,
                     test_checker_collision,
                 )
                     .chain(),

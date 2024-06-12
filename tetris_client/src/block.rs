@@ -1,12 +1,12 @@
 use bevy::math::{Vec2, Vec3};
-use bevy::prelude::{default, Color, Sprite, Transform};
+use bevy::prelude::{Color, default, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
 use tetris_common::components::GridPosition;
 
 use crate::board_ui_calculator::BoardUICalculator;
 
-pub fn new_block(
+pub fn bloc_sprite(
     board_calculator: &BoardUICalculator,
     block_position: GridPosition,
     color: Color,

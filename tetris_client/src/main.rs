@@ -40,7 +40,7 @@ fn add_missing_sprite_to_block(
     for (entity, block) in blocks.iter() {
         let x = block.x;
         let y = block.y;
-        commands.entity(entity).insert(block::new_block(
+        commands.entity(entity).insert(block::bloc_sprite(
             &board_calculator,
             GridPosition { x, y },
             colors[(x + y) as usize % colors.len()],
