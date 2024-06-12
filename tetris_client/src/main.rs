@@ -24,7 +24,7 @@ fn main() {
             (
                 add_missing_sprite_to_block,
                 on_resize_system,
-                update_spirte_position,
+                update_sprite_position,
             ),
         )
         .run()
@@ -49,7 +49,7 @@ fn add_missing_sprite_to_block(
     }
 }
 
-fn update_spirte_position(
+fn update_sprite_position(
     mut blocks: Query<(&mut Transform, &GridPosition), With<Block>>,
     board_calculator: Res<BoardUICalculator>,
 ) {

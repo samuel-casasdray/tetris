@@ -21,15 +21,14 @@ impl Plugin for CommonPlugin {
             .add_systems(
                 PreUpdate,
                 (
-                    (tetromino_spawner, relative_position_system).chain(),
-                    (
-                        tetromino_gravity_system,
-                        collision_resolver,
-                        tetromino_next_move_validator,
-                        tetromino_blocks_fixer,
-                    )
-                        .chain(),
-                ),
+                    tetromino_spawner,
+                    relative_position_system,
+                    tetromino_gravity_system,
+                    collision_resolver,
+                    tetromino_next_move_validator,
+                    tetromino_blocks_fixer,
+                )
+                    .chain(),
             );
     }
 }

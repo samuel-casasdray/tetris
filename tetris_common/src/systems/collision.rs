@@ -6,7 +6,6 @@ use crate::components::{
 use crate::events::BlockCollisionEvent;
 
 pub fn collision_resolver(
-    current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
     controlled_shape: Query<(&Tetromino, &Children), With<Owned>>,
     board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
@@ -39,16 +38,15 @@ pub fn collision_resolver(
         }
     }
 
-    let children_result = current_board_children.get_single();
-    if let Ok(children) = children_result {
-        for block in board_blocks_q.iter_many(children) {
-            for shape_blocks in shape_blocks_q.iter_many(controlled_shape_entities) {
-                // Check collision with shapes block
-                if block.x == shape_blocks.x && block.y == shape_blocks.y {
-                    println!("COLLISION {:?} {:?}", block, shape_blocks);
-                    ev_block_collision.send(BlockCollisionEvent);
-                    return;
-                }
+    for block in board_blocks_q.iter() {
+        for shape_block in shape_blocks_q.iter_many(controlled_shape_entities) {
+            let next_x = shape_block.x + next_move.0.x;
+            let next_y = shape_block.y + next_move.0.y;
+            // Check collision with shapes block
+            if block.x == next_x && block.y == next_y {
+                println!("COLLISION {:?} {:?}", block, shape_block);
+                ev_block_collision.send(BlockCollisionEvent);
+                return;
             }
         }
     }
