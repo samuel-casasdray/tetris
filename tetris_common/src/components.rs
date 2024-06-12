@@ -1,4 +1,4 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Timer};
 use rand::Rng;
 
 use crate::shapes::Shape;
@@ -18,7 +18,7 @@ impl Default for Board {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Tetromino {
     rotation: u8,
     shape: Shape,
@@ -88,4 +88,9 @@ impl From<(i32, i32)> for RelativeGridPosition {
     fn from((x, y): (i32, i32)) -> Self {
         Self { x, y }
     }
+}
+
+#[derive(Component)]
+pub struct GravityTimer {
+    pub timer: Timer,
 }

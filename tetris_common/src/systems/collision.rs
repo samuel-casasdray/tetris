@@ -6,7 +6,7 @@ use crate::events::{BlockCollisionEvent, WallCollisionEvent};
 pub fn collision_check(
     current_board_children: Query<&Children, With<Owned>>,
     current_board: Query<&Board, With<Owned>>,
-    controlled_shape: Query<(&Tetromino, &Children), With<Fake>>,
+    controlled_shape: Query<(&Tetromino, &Children), (With<Fake>, With<Owned>)>,
     blocks: Query<&GridPosition, With<Block>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut ev_wall_collision: EventWriter<WallCollisionEvent>,

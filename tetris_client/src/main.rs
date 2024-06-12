@@ -19,11 +19,18 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(CommonPlugin)
         .add_systems(Startup, (setup_resources, setup_game, setup_walls).chain())
-        .add_systems(Update, (setup_sprites, on_resize_system))
+        .add_systems(
+            Update,
+            (
+                add_missing_sprite_to_block,
+                on_resize_system,
+                update_spirte_position,
+            ),
+        )
         .run()
 }
 
-fn setup_sprites(
+fn add_missing_sprite_to_block(
     mut commands: Commands,
     blocks: Query<(Entity, &GridPosition), (With<Block>, Without<Sprite>)>,
     board_calculator: Res<BoardUICalculator>,
@@ -39,6 +46,17 @@ fn setup_sprites(
             colors[(x + y) as usize % colors.len()],
             board_calculator.block_size,
         ));
+    }
+}
+
+fn update_spirte_position(
+    mut blocks: Query<(&mut Transform, &GridPosition), With<Block>>,
+    board_calculator: Res<BoardUICalculator>,
+) {
+    for (mut transform, grid_position) in blocks.iter_mut() {
+        transform.translation = board_calculator
+            .window_relative_position(grid_position)
+            .extend(0.)
     }
 }
 

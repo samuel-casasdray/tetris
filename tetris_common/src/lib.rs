@@ -1,8 +1,12 @@
-use bevy::prelude::{App, Plugin, Startup, Update};
+use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup, Update};
 
 use crate::events::{BlockCollisionEvent, WallCollisionEvent};
-use crate::systems::{collision_check, relative_position_system, setup_board};
+use crate::systems::{
+    collision_check, relative_position_system, setup_board, tetromino_gravity_system,
+    tetromino_spawner,
+};
 
+mod Bundles;
 pub mod components;
 pub mod events;
 mod shapes;
@@ -15,19 +19,29 @@ impl Plugin for CommonPlugin {
         app.add_event::<BlockCollisionEvent>()
             .add_event::<WallCollisionEvent>()
             .add_systems(Startup, setup_board)
-            .add_systems(Update, (relative_position_system, collision_check));
+            .add_systems(
+                PreUpdate,
+                (
+                    (tetromino_spawner, relative_position_system).chain(),
+                    collision_check,
+                ),
+            )
+            .add_systems(Update, tetromino_gravity_system);
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use bevy::app::{App, Startup};
     use bevy::prelude::{
-        BuildChildren, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Update, With,
+        BuildChildren, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Timer, TimerMode,
+        Update, With,
     };
     use term_grid::{Cell, Direction, Filling, Grid, GridOptions};
 
-    use crate::components::{Block, Board, GridPosition, Owned, Tetromino};
+    use crate::components::{Block, Board, GravityTimer, GridPosition, Owned, Tetromino};
     use crate::systems::{relative_position_system, tetromino_gravity_system};
 
     #[test]
@@ -76,6 +90,10 @@ mod tests {
         let board_entity = commands
             .spawn((Owned, Board::default(), SpatialBundle::default()))
             .id();
+
+        commands.spawn(GravityTimer {
+            timer: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
+        });
 
         let block_entities: Vec<Entity> = (0usize..10usize)
             .flat_map(|x| (0usize..5usize).map(move |y| (x, y)))
