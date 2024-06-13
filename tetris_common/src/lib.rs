@@ -1,9 +1,10 @@
 use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup};
 
-use crate::events::BlockCollisionEvent;
+use crate::events::{BlockCollisionEvent, MovementEvent};
 use crate::systems::{
-    collision_resolver, relative_position_system, setup_board, tetromino_blocks_fixer,
-    tetromino_gravity_system, tetromino_next_move_validator, tetromino_spawner,
+    collision_resolver, movement_system, relative_position_system, setup_board,
+    tetromino_blocks_fixer, tetromino_gravity_system, tetromino_next_move_validator,
+    tetromino_spawner,
 };
 
 mod bundles;
@@ -17,6 +18,7 @@ pub struct CommonPlugin;
 impl Plugin for CommonPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<BlockCollisionEvent>()
+            .add_event::<MovementEvent>()
             .add_systems(Startup, setup_board)
             .add_systems(
                 PreUpdate,
@@ -24,6 +26,7 @@ impl Plugin for CommonPlugin {
                     tetromino_spawner,
                     relative_position_system,
                     tetromino_gravity_system,
+                    movement_system,
                     collision_resolver,
                     tetromino_next_move_validator,
                     tetromino_blocks_fixer,

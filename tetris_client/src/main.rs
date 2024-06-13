@@ -3,6 +3,7 @@ use bevy::window::WindowResized;
 
 use tetris_common::CommonPlugin;
 use tetris_common::components::{Block, GridPosition};
+use tetris_common::events::MovementEvent;
 
 use crate::board_ui_calculator::{
     BoardUICalculator, DEFAULT_BOARD_HEIGHT, DEFAULT_BOARD_WIDTH, get_window_position,
@@ -25,9 +26,22 @@ fn main() {
                 add_missing_sprite_to_block,
                 on_resize_system,
                 update_sprite_position,
+                keyboard_iter,
             ),
         )
         .run()
+}
+
+fn keyboard_iter(keys: Res<ButtonInput<KeyCode>>, mut movement_event: EventWriter<MovementEvent>) {
+    if keys.just_pressed(KeyCode::ArrowRight) {
+        movement_event.send(MovementEvent::Right);
+    }
+    if keys.just_pressed(KeyCode::ArrowLeft) {
+        movement_event.send(MovementEvent::Left);
+    }
+    if keys.just_pressed(KeyCode::ArrowDown) {
+        movement_event.send(MovementEvent::Down);
+    }
 }
 
 fn add_missing_sprite_to_block(

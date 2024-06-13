@@ -96,4 +96,7 @@ pub struct GravityTimer {
 }
 
 #[derive(Debug, Component)]
-pub struct NextMove(pub RelativeGridPosition);
+pub struct TetrominoSpeed {
+    pub x: i32,
+    pub y: i32,
+}

@@ -1,7 +1,7 @@
 use bevy::prelude::{Children, EventWriter, Query, With, Without};
 
 use crate::components::{
-    Block, Board, GridPosition, NextMove, Owned, RelativeGridPosition, Tetromino,
+    Block, Board, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoSpeed,
 };
 use crate::events::BlockCollisionEvent;
 
@@ -10,7 +10,7 @@ pub fn collision_resolver(
     controlled_shape: Query<(&Tetromino, &Children), With<Owned>>,
     board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
     shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
-    mut next_move_q: Query<&mut NextMove, With<Owned>>,
+    mut tetromino_speed_q: Query<&mut TetrominoSpeed, With<Owned>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
 ) {
     let (_, controlled_shape_entities) = match controlled_shape.get_single() {
@@ -18,33 +18,40 @@ pub fn collision_resolver(
         Err(_) => return,
     };
 
-    let mut next_move = next_move_q.single_mut();
+    let mut speed = tetromino_speed_q.single_mut();
 
     let board = current_board.single();
     for shape_block in shape_blocks_q.iter_many(controlled_shape_entities) {
         // Check collision with walls
-        let next_x = shape_block.x + next_move.0.x;
-        let next_y = shape_block.y + next_move.0.y;
+        let next_x = shape_block.x + speed.x;
+        let next_y = shape_block.y + speed.y;
 
         if next_y < 0 {
-            next_move.0.y = 0;
+            speed.y = 0;
+            println!("Bottom wall collision");
             ev_block_collision.send(BlockCollisionEvent);
             return;
         }
 
         if next_x >= board.width as i32 || next_x < 0 {
-            next_move.0.x = 0;
-            return;
+            println!("Left/Right wall collision");
+            speed.x = 0;
         }
     }
 
     for block in board_blocks_q.iter() {
         for shape_block in shape_blocks_q.iter_many(controlled_shape_entities) {
-            let next_x = shape_block.x + next_move.0.x;
-            let next_y = shape_block.y + next_move.0.y;
+            let next_x = shape_block.x + speed.x;
+            let next_y = shape_block.y + speed.y;
             // Check collision with shapes block
             if block.x == next_x && block.y == next_y {
-                println!("COLLISION {:?} {:?}", block, shape_block);
+                println!("COLLISION -> {:?} {:?}", block, shape_block);
+                speed.x = 0;
+            }
+            if block.y == next_y && shape_block.y > block.y && block.x == next_x {
+                speed.x = 0;
+                speed.y = 0;
+                println!("COLLISION -> lock {:?} {:?}", block, shape_block);
                 ev_block_collision.send(BlockCollisionEvent);
                 return;
             }
