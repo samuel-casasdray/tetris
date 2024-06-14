@@ -96,6 +96,11 @@ pub struct GravityTimer {
 }
 
 #[derive(Debug, Component)]
+pub struct MovementTimer {
+    pub timer: Timer,
+}
+
+#[derive(Debug, Component)]
 pub struct TetrominoSpeed {
     pub x: i32,
     pub y: i32,
