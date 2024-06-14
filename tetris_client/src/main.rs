@@ -27,6 +27,7 @@ fn main() {
                 add_missing_sprite_to_block,
                 on_resize_system,
                 update_sprite_position,
+                keyboard_iter
             ),
         )
         .run()
