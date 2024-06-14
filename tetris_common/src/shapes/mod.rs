@@ -82,7 +82,7 @@ impl Shape {
             Shape::T => Color::BLUE,
             Shape::L => Color::YELLOW,
             Shape::J => Color::ORANGE,
-            Shape::Z => Color::RED,
+            Shape::Z => Color::VIOLET,
             Shape::S => Color::PINK,
         }
     }
