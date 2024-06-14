@@ -12,7 +12,9 @@ pub fn line_remove (
         let board = current_board.single();
         let mut ys = vec![0; board.height];
         for (_, pos) in &board_blocks {
-            ys[pos.y as usize] += 1;
+            if pos.y < board.height as i32 {
+                ys[pos.y as usize] += 1;
+            }
         }
         for i in (0..board.height).rev() {
             if ys[i] == board.width {
