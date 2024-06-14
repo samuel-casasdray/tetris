@@ -1,3 +1,5 @@
+use bevy::prelude::Color;
+
 use crate::components::RelativeGridPosition;
 use crate::shapes::shape_i::{shape_i1, shape_i2, shape_i3, shape_i4};
 use crate::shapes::shape_j::{shape_j1, shape_j2, shape_j3, shape_j4};
@@ -25,8 +27,6 @@ pub enum Shape {
     Z,
     S,
 }
-
-
 
 pub type ShapePosition = [RelativeGridPosition; 4];
 
@@ -75,14 +75,25 @@ impl Shape {
         }
     }
 
+    pub fn color(&self) -> Color {
+        match self {
+            Shape::I => Color::RED,
+            Shape::O => Color::GREEN,
+            Shape::T => Color::BLUE,
+            Shape::L => Color::YELLOW,
+            Shape::J => Color::ORANGE,
+            Shape::Z => Color::RED,
+            Shape::S => Color::PINK,
+        }
+    }
     // fn rotate_shape(&self, rotation: u8) -> ShapePosition {
     //     let base_shape = shape_z();
     //     let center: (i32, i32) = (base_shape.1.x, base_shape.1.y);
     //     return [(0, 0).into(), (0, 0).into(), (0, 0).into(), (0, 0).into()]
     // }
-    // 
+    //
     // fn rotation(x: i32, y: i32, center_x: i32, center_y: i32, rotation: u8) -> (i32, i32) {
-    //     match rotation { 
+    //     match rotation {
     //         0 => (x, y),
     //         1 => (-y, x),
     //         2 => (2 * center_x - x, 2 * center_y - y),

@@ -1,4 +1,4 @@
-use bevy::prelude::{Component, Timer};
+use bevy::prelude::{Color, Component, Timer};
 use rand::Rng;
 
 use crate::shapes::{Shape, ShapePosition};
@@ -20,8 +20,8 @@ impl Default for Board {
 
 #[derive(Debug, Component, Clone)]
 pub struct Tetromino {
-    rotation: u8,
-    shape: Shape,
+    pub rotation: u8,
+    pub shape: Shape,
 }
 
 impl Tetromino {
@@ -65,7 +65,15 @@ pub struct Owned;
 pub struct Fake;
 
 #[derive(Debug, Component)]
-pub struct Block;
+pub struct Block {
+    pub color: Color,
+}
+
+impl Block {
+    pub fn new(color: Color) -> Self {
+        Self { color }
+    }
+}
 
 /// A position inside the tetris board grid
 #[derive(Debug, Component, Clone)]

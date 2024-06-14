@@ -62,7 +62,9 @@ pub fn collision_resolver(
 #[cfg(test)]
 mod tests {
     use bevy::app::{App, Startup};
-    use bevy::prelude::{BuildChildren, Commands, EventReader, IntoSystemConfigs, Res, Resource};
+    use bevy::prelude::{
+        BuildChildren, Color, Commands, EventReader, IntoSystemConfigs, Res, Resource,
+    };
 
     use crate::bundles::OwnedNextMoveBundle;
     use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
@@ -96,13 +98,13 @@ mod tests {
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn((Block, GridPosition { x: 10, y: 10 }));
+                parent.spawn((Block::new(Color::RED), GridPosition { x: 10, y: 10 }));
             });
 
         commands
             .spawn((Fake, Tetromino::get_random_shape()))
             .with_children(|parent| {
-                parent.spawn((Block, GridPosition { x: 11, y: 10 }));
+                parent.spawn((Block::new(Color::RED), GridPosition { x: 11, y: 10 }));
             });
         commands.insert_resource(ShouldCollide(true))
     }
@@ -112,13 +114,13 @@ mod tests {
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
-                parent.spawn((Block, GridPosition { x: 10, y: 10 }));
+                parent.spawn((Block::new(Color::RED), GridPosition { x: 10, y: 10 }));
             });
 
         commands
             .spawn((Fake, Tetromino::get_random_shape()))
             .with_children(|parent| {
-                parent.spawn((Block, GridPosition { x: 11, y: 10 }));
+                parent.spawn((Block::new(Color::RED), GridPosition { x: 11, y: 10 }));
             });
         commands.insert_resource(ShouldCollide(true))
     }

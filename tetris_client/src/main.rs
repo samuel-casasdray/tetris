@@ -1,4 +1,5 @@
 use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy::window::WindowResized;
 
@@ -27,7 +28,7 @@ fn main() {
                 add_missing_sprite_to_block,
                 on_resize_system,
                 update_sprite_position,
-                keyboard_iter
+                keyboard_iter,
             ),
         )
         .run()
@@ -39,7 +40,7 @@ pub fn keyboard_iter(
     keys: Res<ButtonInput<KeyCode>>,
     mut movement_event: EventWriter<MovementEvent>,
     time: Res<Time>,
-    mut movement_timer: Query<&mut MovementTimer>
+    mut movement_timer: Query<&mut MovementTimer>,
 ) {
     let mut gravity_timer = movement_timer.single_mut();
     gravity_timer.timer.tick(time.delta());
@@ -61,18 +62,14 @@ pub fn keyboard_iter(
 }
 fn add_missing_sprite_to_block(
     mut commands: Commands,
-    blocks: Query<(Entity, &GridPosition), (With<Block>, Without<Sprite>)>,
+    blocks: Query<(Entity, &GridPosition, &Block), Without<Sprite>>,
     board_calculator: Res<BoardUICalculator>,
 ) {
-    let colors = [Color::RED, Color::BLUE, Color::GREEN, Color::YELLOW];
-
-    for (entity, block) in blocks.iter() {
-        let x = block.x;
-        let y = block.y;
+    for (entity, GridPosition { x, y }, Block { color }) in blocks.iter() {
         commands.entity(entity).insert(block::bloc_sprite(
             &board_calculator,
-            GridPosition { x, y },
-            colors[(x + y) as usize % colors.len()],
+            GridPosition { x: *x, y: *y },
+            *color,
             board_calculator.block_size,
         ));
     }
@@ -169,7 +166,10 @@ fn setup_game(mut commands: Commands, window: Query<&Window>) {
     });
 
     commands.spawn(MovementTimer {
-        timer: Timer::new(Duration::from_millis(TIME_BETWEEN_MOVEMENT), TimerMode::Repeating),
+        timer: Timer::new(
+            Duration::from_millis(TIME_BETWEEN_MOVEMENT),
+            TimerMode::Repeating,
+        ),
     });
 }
 

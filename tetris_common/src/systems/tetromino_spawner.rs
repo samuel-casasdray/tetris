@@ -14,21 +14,25 @@ pub fn tetromino_spawner(
     }
 
     let tetromino = Tetromino::get_random_shape();
+    let color = tetromino.shape.color();
     let positions = tetromino.get_blocks_positions();
     let board = board_q.single();
 
     commands
         .spawn((
-            OwnedTetrominoBundle::new_random(GridPosition {
-                x: 5,
-                y: board.height as i32,
-            }),
+            OwnedTetrominoBundle::new(
+                GridPosition {
+                    x: 5,
+                    y: board.height as i32,
+                },
+                tetromino,
+            ),
             SpatialBundle::default(),
         ))
         .with_children(|child| {
             for relative_positions in positions {
                 child.spawn((
-                    OwnedRelativeBlockBundle::new(relative_positions),
+                    OwnedRelativeBlockBundle::new(relative_positions, color),
                     SpatialBundle::default(),
                 ));
             }
