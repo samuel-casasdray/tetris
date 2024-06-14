@@ -1,8 +1,6 @@
 use bevy::prelude::{Bundle, Color};
 
-use crate::components::{
-    Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoSpeed,
-};
+use crate::components::{Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotation, TetrominoSpeed};
 
 #[derive(Bundle)]
 pub struct OwnedTetrominoBundle {
@@ -30,6 +28,7 @@ pub struct OwnedRelativeBlockBundle {
     owned_block_bundle: OwnedBlockBundle,
     relative_grid_position: RelativeGridPosition,
 }
+
 impl OwnedRelativeBlockBundle {
     pub fn new(relative_grid_position: RelativeGridPosition, color: Color) -> Self {
         Self {
@@ -45,6 +44,7 @@ pub struct OwnedBlockBundle {
     block: Block,
     grid_position: GridPosition,
 }
+
 impl OwnedBlockBundle {
     pub fn new(grid_position: GridPosition, color: Color) -> Self {
         Self {
@@ -54,16 +54,20 @@ impl OwnedBlockBundle {
         }
     }
 }
+
 #[derive(Bundle)]
 pub struct OwnedNextMoveBundle {
     owned: Owned,
     next_move: TetrominoSpeed,
+    next_rotation: TetrominoRotation,
 }
+
 impl OwnedNextMoveBundle {
     pub fn new() -> Self {
         Self {
             owned: Owned,
             next_move: TetrominoSpeed { x: 0, y: 0 },
+            next_rotation: TetrominoRotation::new(),
         }
     }
 }

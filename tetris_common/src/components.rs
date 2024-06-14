@@ -109,7 +109,23 @@ pub struct MovementTimer {
 }
 
 #[derive(Debug, Component)]
+pub struct RotationTimer {
+    pub timer: Timer,
+}
+
+#[derive(Debug, Component)]
 pub struct TetrominoSpeed {
     pub x: i32,
     pub y: i32,
+}
+
+#[derive(Debug, Component)]
+pub struct TetrominoRotation {
+    pub rotations: [(i32, i32); 4],
+}
+
+impl TetrominoRotation {
+    pub fn new() -> Self {
+        Self { rotations: [(0, 0), (0, 0), (0, 0), (0, 0)] }
+    }
 }

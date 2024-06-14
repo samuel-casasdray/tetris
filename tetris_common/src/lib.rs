@@ -2,9 +2,9 @@ use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup};
 
 use crate::events::{BlockCollisionEvent, MovementEvent};
 use crate::systems::{
-    collision_resolver, movement_system, relative_position_system, setup_board,
-    tetromino_blocks_fixer, tetromino_gravity_system, tetromino_next_move_validator,
-    tetromino_spawner, line_remove
+    collision_resolver, line_remove, movement_system, relative_position_system,
+    setup_board, tetromino_blocks_fixer, tetromino_gravity_system,
+    tetromino_next_move_validator, tetromino_spawner,
 };
 
 mod bundles;
@@ -42,10 +42,7 @@ mod tests {
     use std::time::Duration;
 
     use bevy::app::{App, Startup};
-    use bevy::prelude::{
-        BuildChildren, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Timer, TimerMode,
-        Update, With,
-    };
+    use bevy::prelude::{BuildChildren, Color, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Timer, TimerMode, Update, With};
     use term_grid::{Cell, Direction, Filling, Grid, GridOptions};
 
     use crate::components::{Block, Board, GravityTimer, GridPosition, Owned, Tetromino};
@@ -85,7 +82,7 @@ mod tests {
                 for relative_positions in positions {
                     child.spawn((
                         Owned,
-                        Block,
+                        Block { color: Color::ORANGE },
                         relative_positions,
                         GridPosition { x: 0, y: 0 },
                     ));
@@ -108,7 +105,7 @@ mod tests {
                 commands
                     .spawn((
                         Owned,
-                        Block,
+                        Block { color: Color::ORANGE },
                         GridPosition {
                             x: x as i32,
                             y: y as i32,

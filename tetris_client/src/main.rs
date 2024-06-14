@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::window::WindowResized;
 
 use tetris_common::CommonPlugin;
-use tetris_common::components::{Block, GridPosition, MovementTimer};
+use tetris_common::components::{Block, GridPosition, MovementTimer, RotationTimer};
 use tetris_common::events::MovementEvent;
 
 use crate::board_ui_calculator::{
@@ -35,15 +35,19 @@ fn main() {
 }
 
 pub const TIME_BETWEEN_MOVEMENT: u64 = 50;
+pub const TIME_BETWEEN_ROTATION: u64 = 200;
 
 pub fn keyboard_iter(
     keys: Res<ButtonInput<KeyCode>>,
     mut movement_event: EventWriter<MovementEvent>,
     time: Res<Time>,
     mut movement_timer: Query<&mut MovementTimer>,
+    mut rotation_timer: Query<&mut RotationTimer>,
 ) {
     let mut gravity_timer = movement_timer.single_mut();
+    let mut rotation_timer = rotation_timer.single_mut();
     gravity_timer.timer.tick(time.delta());
+    rotation_timer.timer.tick(time.delta());
 
     if gravity_timer.timer.finished() {
         if keys.pressed(KeyCode::ArrowRight) {
@@ -55,7 +59,9 @@ pub fn keyboard_iter(
         if keys.pressed(KeyCode::ArrowDown) {
             movement_event.send(MovementEvent::Down);
         }
-        if keys.just_pressed(KeyCode::ArrowUp) {
+    }
+    if rotation_timer.timer.finished() {
+        if keys.pressed(KeyCode::ArrowUp) {
             movement_event.send(MovementEvent::RotationRight);
         }
     }
@@ -168,6 +174,12 @@ fn setup_game(mut commands: Commands, window: Query<&Window>) {
     commands.spawn(MovementTimer {
         timer: Timer::new(
             Duration::from_millis(TIME_BETWEEN_MOVEMENT),
+            TimerMode::Repeating,
+        ),
+    });
+    commands.spawn(RotationTimer {
+        timer: Timer::new(
+            Duration::from_millis(TIME_BETWEEN_ROTATION),
             TimerMode::Repeating,
         ),
     });
