@@ -1,7 +1,7 @@
 use bevy::prelude::{Component, Timer};
 use rand::Rng;
 
-use crate::shapes::Shape;
+use crate::shapes::{Shape, ShapePosition};
 
 #[derive(Debug, Component)]
 pub struct Board {
@@ -25,7 +25,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn get_blocks_positions(&self) -> [RelativeGridPosition; 4] {
+    pub fn get_blocks_positions(&self) -> ShapePosition {
         self.shape.get_blocks(self.rotation)
     }
 
