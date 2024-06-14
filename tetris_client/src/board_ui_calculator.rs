@@ -3,7 +3,6 @@ use bevy::prelude::Resource;
 
 use tetris_common::components::GridPosition;
 
-
 pub const DEFAULT_BOARD_WIDTH: usize = 10;
 pub const DEFAULT_BOARD_HEIGHT: usize = 20;
 pub const MAX_BOARD_WIDTH_PERCENT: f32 = 0.4;

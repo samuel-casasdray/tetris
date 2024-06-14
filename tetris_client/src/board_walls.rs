@@ -1,5 +1,5 @@
 use bevy::math::{Vec2, Vec3};
-use bevy::prelude::{default, Bundle, Color, Component, Sprite, SpriteBundle, Transform};
+use bevy::prelude::{Bundle, Color, Component, default, Sprite, SpriteBundle, Transform};
 
 #[derive(Bundle)]
 pub struct BoardWallsBundle {

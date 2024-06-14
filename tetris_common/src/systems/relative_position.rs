@@ -13,12 +13,12 @@ pub fn relative_position_system(
             .iter()
             .map(|(entity, relative_pos, parent)| {
                 (
-                entity,
-                relative_pos,
-                grid_positions.get(parent.get()).expect(
-                    "To use a relative position the parent must have a GridPosition component",
-                ).clone(),
-            )
+                    entity,
+                    relative_pos,
+                    grid_positions.get(parent.get()).expect(
+                        "To use a relative position the parent must have a GridPosition component",
+                    ).clone(),
+                )
             })
             .collect();
 

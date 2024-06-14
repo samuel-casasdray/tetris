@@ -1,12 +1,13 @@
 use bevy::prelude::{Commands, Entity, EventReader, Query, With, Without};
+
 use crate::components::{Block, Board, GridPosition, Owned, RelativeGridPosition};
 use crate::events::BlockCollisionEvent;
 
-pub fn line_remove (
+pub fn line_remove(
     mut commands: Commands,
     current_board: Query<&Board, With<Owned>>,
     mut board_blocks: Query<(Entity, &mut GridPosition), (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
-    mut ev_block_collision: EventReader<BlockCollisionEvent>
+    mut ev_block_collision: EventReader<BlockCollisionEvent>,
 ) {
     for _ in ev_block_collision.read() {
         let board = current_board.single();

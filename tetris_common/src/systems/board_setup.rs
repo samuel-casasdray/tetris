@@ -7,8 +7,8 @@ use crate::components::{Board, GravityTimer, Owned};
 
 pub fn setup_board(mut commands: Commands) {
     commands.spawn(OwnedNextMoveBundle::new());
-    
-    commands .spawn((Owned, Board::default(), SpatialBundle::default()));
+
+    commands.spawn((Owned, Board::default(), SpatialBundle::default()));
 
     commands.spawn(GravityTimer {
         timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),

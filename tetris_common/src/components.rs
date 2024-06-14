@@ -81,6 +81,7 @@ pub struct GridPosition {
     pub x: i32,
     pub y: i32,
 }
+
 impl From<(i32, i32)> for GridPosition {
     fn from((x, y): (i32, i32)) -> Self {
         Self { x, y }
@@ -92,6 +93,7 @@ pub struct RelativeGridPosition {
     pub x: i32,
     pub y: i32,
 }
+
 impl From<(i32, i32)> for RelativeGridPosition {
     fn from((x, y): (i32, i32)) -> Self {
         Self { x, y }
