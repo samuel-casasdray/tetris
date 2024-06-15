@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::window::WindowResized;
 
 use tetris_common::CommonPlugin;
-use tetris_common::components::{Block, GridPosition, MovementTimer, RotationTimer};
+use tetris_common::components::{Block, GridPosition, MovementTimer, RotationTimer, Score, ScoreText};
 use tetris_common::events::MovementEvent;
 
 use crate::board_ui_calculator::{
@@ -29,9 +29,16 @@ fn main() {
                 on_resize_system,
                 update_sprite_position,
                 keyboard_iter,
+                update_score
             ),
         )
         .run()
+}
+
+pub fn update_score(mut score_text: Query<&mut Text, With<ScoreText>>, score: Query<&Score>) {
+    let mut score_text = score_text.single_mut();
+    let score = score.single();
+    score_text.sections[0].value = score.to_string();
 }
 
 pub const TIME_BETWEEN_MOVEMENT: u64 = 50;
@@ -163,7 +170,7 @@ fn setup_resources(mut commands: Commands, window: Query<&Window>) {
     commands.insert_resource(board_calculator);
 }
 
-fn setup_game(mut commands: Commands, window: Query<&Window>) {
+fn setup_game(mut commands: Commands, window: Query<&Window>, score: Query<&Score>) {
     let window = window.single();
 
     commands.spawn(Camera2dBundle {
@@ -183,6 +190,25 @@ fn setup_game(mut commands: Commands, window: Query<&Window>) {
             TimerMode::Repeating,
         ),
     });
+
+    let score = score.single();
+
+    commands.spawn((
+        TextBundle::from_section(
+            score.to_string(),
+            TextStyle {
+                font_size: 24.,
+                ..default()
+            },
+        )
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                top: Val::Px(20.),
+                left: Val::Px(20.),
+                ..default()
+            }),
+        ScoreText
+    ));
 }
 
 fn setup_walls(mut commands: Commands, board_cal: Res<BoardUICalculator>) {

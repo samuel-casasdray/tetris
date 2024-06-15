@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::{Commands, SpatialBundle, Timer, TimerMode};
 
 use crate::bundles::OwnedNextMoveBundle;
-use crate::components::{Board, GravityTimer, Owned};
+use crate::components::{Board, GravityTimer, Owned, Score};
 
 pub fn setup_board(mut commands: Commands) {
     commands.spawn(OwnedNextMoveBundle::new());
@@ -13,6 +13,8 @@ pub fn setup_board(mut commands: Commands) {
     commands.spawn(GravityTimer {
         timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
     });
+
+    commands.spawn(Score::new());
 
     // let block_entities: Vec<Entity> = (0usize..10usize)
     //     .flat_map(|x| (0usize..20usize).map(move |y| (x, y)))

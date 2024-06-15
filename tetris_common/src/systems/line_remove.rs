@@ -1,6 +1,6 @@
 use bevy::prelude::{Commands, Entity, EventReader, Query, With, Without};
 
-use crate::components::{Block, Board, GridPosition, Owned, RelativeGridPosition};
+use crate::components::{Block, Board, GridPosition, Owned, RelativeGridPosition, Score};
 use crate::events::BlockCollisionEvent;
 
 pub fn line_remove(
@@ -8,6 +8,7 @@ pub fn line_remove(
     current_board: Query<&Board, With<Owned>>,
     mut board_blocks: Query<(Entity, &mut GridPosition), (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
     mut ev_block_collision: EventReader<BlockCollisionEvent>,
+    mut score: Query<&mut Score>,
 ) {
     for _ in ev_block_collision.read() {
         let board = current_board.single();
@@ -17,6 +18,7 @@ pub fn line_remove(
                 ys[pos.y as usize] += 1;
             }
         }
+        let mut l = 0;
         for i in (0..board.height).rev() {
             if ys[i] == board.width {
                 for (entity, mut pos) in board_blocks.iter_mut() {
@@ -26,7 +28,10 @@ pub fn line_remove(
                         commands.entity(entity).despawn()
                     }
                 }
+                l += 1;
             }
         }
+        let mut score = score.single_mut();
+        score.add_score_line(l);
     }
 }
