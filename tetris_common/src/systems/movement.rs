@@ -28,7 +28,7 @@ pub fn movement_system(
                 let rot = tetromino.rotation;
                 tetromino.rotate_right();
                 let (old_position, new_position) = (tetromino.shape.get_blocks(rot), tetromino.shape.get_blocks(tetromino.rotation));
-                for i in 0..=old_position.len() {
+                for i in 0..old_position.len() {
                     tetromino_rotation.rotations[i] = (new_position[i].x - old_position[i].x, new_position[i].y - old_position[i].y);
                 }
             }

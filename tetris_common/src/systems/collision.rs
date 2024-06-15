@@ -5,14 +5,14 @@ use crate::events::BlockCollisionEvent;
 
 pub fn collision_resolver(
     current_board: Query<&Board, With<Owned>>,
-    controlled_shape: Query<(&Tetromino, &Children), With<Owned>>,
+    mut controlled_shape: Query<(&mut Tetromino, &Children), With<Owned>>,
     board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
     shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
     mut tetromino_speed_q: Query<&mut TetrominoSpeed, With<Owned>>,
     mut tetromino_rotation: Query<&mut TetrominoRotation, With<Owned>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
 ) {
-    let (_, controlled_shape_entities) = match controlled_shape.get_single() {
+    let (mut tetromino, controlled_shape_entities) = match controlled_shape.get_single_mut() {
         Ok(query) => query,
         Err(_) => return,
     };
@@ -75,6 +75,7 @@ pub fn collision_resolver(
     }
 
     if cancel_rotation {
+        tetromino.rotate_left();
         *tetromino_rotation = TetrominoRotation::new();
     }
 }

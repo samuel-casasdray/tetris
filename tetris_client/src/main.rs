@@ -56,6 +56,13 @@ pub fn keyboard_iter(
     gravity_timer.timer.tick(time.delta());
     rotation_timer.timer.tick(time.delta());
 
+    if keys.any_just_released([KeyCode::ArrowRight, KeyCode::ArrowLeft, KeyCode::ArrowDown]) {
+        gravity_timer.timer.tick(Duration::from_millis(TIME_BETWEEN_MOVEMENT));
+    }
+    if keys.just_released(KeyCode::ArrowUp) {
+        rotation_timer.timer.tick(Duration::from_millis(TIME_BETWEEN_ROTATION));
+    }
+
     if gravity_timer.timer.finished() {
         if keys.pressed(KeyCode::ArrowRight) {
             movement_event.send(MovementEvent::Right);
@@ -68,11 +75,12 @@ pub fn keyboard_iter(
         }
     }
     if rotation_timer.timer.finished() {
-        if keys.pressed(KeyCode::ArrowUp) {
+        if keys.pressed(KeyCode::ArrowUp) || keys.just_pressed(KeyCode::ArrowUp) {
             movement_event.send(MovementEvent::RotationRight);
         }
     }
 }
+
 fn add_missing_sprite_to_block(
     mut commands: Commands,
     blocks: Query<(Entity, &GridPosition, &Block), Without<Sprite>>,
@@ -133,15 +141,15 @@ fn on_resize_system(
         }
         let walls_size = board_calculator.window_relative_board_walls();
         for mut wall in walls.iter_mut().zip(walls_size) {
-            *wall.0 .0 = wall
+            *wall.0.0 = wall
                 .0
-                 .0
+                .0
                 .with_scale(Vec3::new(
-                    wall.0 .0.scale.x * board_calculator.block_size / old_block_size,
-                    wall.0 .0.scale.y * board_calculator.block_size / old_block_size,
+                    wall.0.0.scale.x * board_calculator.block_size / old_block_size,
+                    wall.0.0.scale.y * board_calculator.block_size / old_block_size,
                     1.,
                 ))
-                .with_translation(wall.1 .0.extend(0.))
+                .with_translation(wall.1.0.extend(0.))
         }
     }
 }
@@ -221,7 +229,7 @@ fn setup_walls(mut commands: Commands, board_cal: Res<BoardUICalculator>) {
     ];
 
     for wall in walls.iter().zip(walls_order) {
-        let wall_bundle = BoardWallsBundle::new(wall.0 .0, wall.0 .1, wall.1);
+        let wall_bundle = BoardWallsBundle::new(wall.0.0, wall.0.1, wall.1);
         commands.spawn(wall_bundle);
     }
 }
