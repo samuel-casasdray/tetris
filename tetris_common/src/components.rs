@@ -130,7 +130,9 @@ pub struct TetrominoRotation {
 
 impl TetrominoRotation {
     pub fn new() -> Self {
-        Self { rotations: [(0, 0), (0, 0), (0, 0), (0, 0)] }
+        Self {
+            rotations: [(0, 0); 4],
+        }
     }
 }
 
