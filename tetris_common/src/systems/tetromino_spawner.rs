@@ -22,7 +22,7 @@ pub fn tetromino_spawner(
         .spawn((
             OwnedTetrominoBundle::new(
                 GridPosition {
-                    x: 5,
+                    x: 3,
                     y: board.height as i32,
                 },
                 tetromino,
