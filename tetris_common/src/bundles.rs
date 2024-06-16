@@ -1,9 +1,10 @@
-use bevy::prelude::{Bundle, Color};
+use bevy::prelude::{Bundle, Color, Name};
 
 use crate::components::{Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotation, TetrominoSpeed};
 
 #[derive(Bundle)]
 pub struct OwnedTetrominoBundle {
+    name:Name,
     owned: Owned,
     tetromino: Tetromino,
     grid_position: GridPosition,
@@ -12,6 +13,7 @@ pub struct OwnedTetrominoBundle {
 impl OwnedTetrominoBundle {
     pub fn new(grid_position: GridPosition, tetromino: Tetromino) -> Self {
         Self {
+            name: Name::new("OwnedTetromino"),
             owned: Owned,
             tetromino,
             grid_position,
@@ -40,6 +42,7 @@ impl OwnedRelativeBlockBundle {
 
 #[derive(Bundle)]
 pub struct OwnedBlockBundle {
+    name: Name,
     owned: Owned,
     block: Block,
     grid_position: GridPosition,
@@ -48,6 +51,7 @@ pub struct OwnedBlockBundle {
 impl OwnedBlockBundle {
     pub fn new(grid_position: GridPosition, color: Color) -> Self {
         Self {
+            name: Name::new("OwnedBlock"),
             owned: Owned,
             block: Block::new(color),
             grid_position,
@@ -56,15 +60,17 @@ impl OwnedBlockBundle {
 }
 
 #[derive(Bundle)]
-pub struct OwnedNextMoveBundle {
+pub struct OwnedTetrominoSpeedBundle {
+    name: Name,
     owned: Owned,
     next_move: TetrominoSpeed,
     next_rotation: TetrominoRotation,
 }
 
-impl OwnedNextMoveBundle {
+impl OwnedTetrominoSpeedBundle {
     pub fn new() -> Self {
         Self {
+            name: Name::new("Owned Tetromino Speed"),
             owned: Owned,
             next_move: TetrominoSpeed { x: 0, y: 0 },
             next_rotation: TetrominoRotation::new(),

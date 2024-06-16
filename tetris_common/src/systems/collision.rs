@@ -86,7 +86,7 @@ mod tests {
         BuildChildren, Color, Commands, EventReader, IntoSystemConfigs, Res, Resource,
     };
 
-    use crate::bundles::OwnedNextMoveBundle;
+    use crate::bundles::OwnedTetrominoSpeedBundle;
     use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
     use crate::events::BlockCollisionEvent;
     use crate::systems::collision_resolver;
@@ -114,7 +114,7 @@ mod tests {
     }
 
     pub fn setup_board_no_collision(mut commands: Commands) {
-        commands.spawn(OwnedNextMoveBundle::new());
+        commands.spawn(OwnedTetrominoSpeedBundle::new());
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {
@@ -130,7 +130,7 @@ mod tests {
     }
 
     pub fn setup_board_block_collision(mut commands: Commands) {
-        commands.spawn(OwnedNextMoveBundle::new());
+        commands.spawn(OwnedTetrominoSpeedBundle::new());
         commands
             .spawn((Owned, Board::default()))
             .with_children(|parent| {

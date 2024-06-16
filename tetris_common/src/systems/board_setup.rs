@@ -2,11 +2,11 @@ use std::time::Duration;
 
 use bevy::prelude::{Commands, SpatialBundle, Timer, TimerMode};
 
-use crate::bundles::OwnedNextMoveBundle;
+use crate::bundles::OwnedTetrominoSpeedBundle;
 use crate::components::{Board, GravityTimer, Owned};
 
 pub fn setup_board(mut commands: Commands) {
-    commands.spawn(OwnedNextMoveBundle::new());
+    commands.spawn(OwnedTetrominoSpeedBundle::new());
 
     commands.spawn((Owned, Board::default(), SpatialBundle::default()));
 

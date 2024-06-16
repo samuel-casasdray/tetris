@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy::window::WindowResized;
+use bevy_egui::EguiPlugin;
 
 use tetris_common::CommonPlugin;
 use tetris_common::components::{Block, GridPosition, MovementTimer, RotationTimer};
@@ -20,6 +21,8 @@ mod board_walls;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(EguiPlugin)
+        .add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new())
         .add_plugins(CommonPlugin)
         .add_systems(Startup, (setup_resources, setup_game, setup_walls).chain())
         .add_systems(
