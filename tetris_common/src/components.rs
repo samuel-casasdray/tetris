@@ -144,7 +144,6 @@ pub struct TetrominoRotateTo(pub Option<u8>);
 
 #[derive(Debug, Component)]
 pub struct Score {
-    pub level: u8,
     pub score: u64,
 }
 
@@ -153,21 +152,21 @@ pub struct ScoreText;
 
 impl Score {
     pub fn new() -> Self {
-        Self { level: 0, score: 0 }
+        Self { score: 0 }
     }
-    pub fn add_score_line(&mut self, lines: u8) {
+    pub fn add_score_line(&mut self, level: u8, lines: u8) {
         self.score += match lines {
             0 => 0,
             1 => 40,
             2 => 100,
             3 => 300,
             _ => 1200,
-        } * (self.level + 1) as u64;
+        } * (level + 1) as u64;
     }
 }
 
 impl Display for Score {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Score : {}\nLevel : {}", self.score, self.level)
+        write!(f, "Score : {}", self.score)
     }
 }

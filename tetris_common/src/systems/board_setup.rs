@@ -13,6 +13,6 @@ pub fn setup_board(mut commands: Commands) {
             builder.spawn(GravityTimer {
                 timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
             });
-            builder.spawn(Score::new());
+            builder.spawn((Score::new(), Owned));
         });
 }
