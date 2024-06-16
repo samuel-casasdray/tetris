@@ -23,16 +23,17 @@ pub fn line_remove(
         }
         let mut number_of_lines = 0;
         for i in (0..board.height).rev() {
-            if ys[i] == board.width {
-                for (entity, mut pos) in board_blocks_q.iter_mut() {
-                    if pos.y > i as i32 {
-                        pos.y -= 1;
-                    } else if pos.y == i as i32 {
-                        commands.entity(entity).despawn();
-                    }
-                }
-                number_of_lines += 1;
+            if ys[i] != board.width {
+                continue;
             }
+            for (entity, mut pos) in board_blocks_q.iter_mut() {
+                if pos.y > i as i32 {
+                    pos.y -= 1;
+                } else if pos.y == i as i32 {
+                    commands.entity(entity).despawn();
+                }
+            }
+            number_of_lines += 1;
         }
         let mut score = score_q.single_mut();
         score.add_score_line(board.level, number_of_lines);
