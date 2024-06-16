@@ -9,9 +9,9 @@ pub fn shape_z2() -> ShapePosition {
 }
 
 pub fn shape_z3() -> ShapePosition {
-    [(0, 1).into(), (1, 1).into(), (1, 0).into(), (2, 0).into()]
+    [(2, 0).into(), (1, 0).into(), (1, 1).into(), (0, 1).into()]
 }
 
 pub fn shape_z4() -> ShapePosition {
-    [(1, 2).into(), (1, 1).into(), (0, 1).into(), (0, 0).into()]
+    [(0, 0).into(), (0, 1).into(), (1, 1).into(), (1, 2).into()]
 }
