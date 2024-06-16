@@ -24,7 +24,16 @@ pub fn relative_position_system(
 
     for (entity, relative_pos, parent_grid_pos) in entities_with_rel_pos_grid_pos {
         let mut grid_position = grid_positions.get_mut(entity).unwrap();
-        grid_position.x = parent_grid_pos.x + relative_pos.x;
-        grid_position.y = parent_grid_pos.y + relative_pos.y;
+        *grid_position = get_grid_position(&relative_pos, &parent_grid_pos);
     }
+}
+
+pub fn get_grid_position(
+    relative_position: &RelativeGridPosition,
+    parent_position: &GridPosition,
+) -> GridPosition {
+    GridPosition::from((
+        parent_position.x + relative_position.x,
+        parent_position.y + relative_position.y,
+    ))
 }

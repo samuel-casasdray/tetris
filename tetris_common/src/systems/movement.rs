@@ -1,13 +1,13 @@
 use bevy::prelude::{EventReader, Query, With};
 
-use crate::components::{Owned, Tetromino, TetrominoRotation, TetrominoSpeed};
+use crate::components::{Owned, Tetromino, TetrominoRotateTo, TetrominoSpeed};
 use crate::events::MovementEvent;
 
 pub fn movement_system(
     mut movement_event: EventReader<MovementEvent>,
     mut next_move_q: Query<&mut TetrominoSpeed, With<Owned>>,
-    mut tetromino: Query<&mut Tetromino>,
-    mut tetromino_rotation: Query<&mut TetrominoRotation, With<Owned>>,
+    mut tetromino: Query<&mut Tetromino, With<Owned>>,
+    mut tetromino_rotation: Query<&mut TetrominoRotateTo, With<Owned>>,
 ) {
     let mut next_move = next_move_q.single_mut();
 
@@ -23,16 +23,15 @@ pub fn movement_system(
                 next_move.y -= 1;
             }
             MovementEvent::RotationRight => {
-                let mut tetromino = tetromino.single_mut();
-                let mut tetromino_rotation = tetromino_rotation.single_mut();
-                let rot = tetromino.rotation;
-                tetromino.rotate_right();
-                let (old_position, new_position) = (tetromino.shape.get_blocks(rot), tetromino.shape.get_blocks(tetromino.rotation));
-                for i in 0..old_position.len() {
-                    tetromino_rotation.rotations[i] = (new_position[i].x - old_position[i].x, new_position[i].y - old_position[i].y);
-                }
+                let mut rotation = tetromino_rotation.single_mut();
+                let tetromino = tetromino.single_mut();
+                rotation.0 = Some(tetromino.get_rotation_right());
             }
-            MovementEvent::RotationLeft => {}
+            MovementEvent::RotationLeft => {
+                let mut rotation = tetromino_rotation.single_mut();
+                let tetromino = tetromino.single_mut();
+                rotation.0 = Some(tetromino.get_rotation_left());
+            }
         }
     }
 }
