@@ -11,3 +11,7 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
+
+[profile.dev.package.tetris_common]
+opt-level = 2
+
