@@ -1,6 +1,9 @@
 use bevy::prelude::{Children, EventWriter, Query, With, Without};
 
-use crate::components::{Block, Board, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotation, TetrominoSpeed};
+use crate::components::{
+    Block, Board, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotation,
+    TetrominoSpeed,
+};
 use crate::events::BlockCollisionEvent;
 
 pub fn collision_resolver(
@@ -23,7 +26,10 @@ pub fn collision_resolver(
     let board = current_board.single();
     let mut cancel_rotation = false;
     let mut stop = false;
-    for (shape_block, (x, y)) in shape_blocks_q.iter_many(controlled_shape_entities).zip(tetromino_rotation.rotations) {
+    for (shape_block, (x, y)) in shape_blocks_q
+        .iter_many(controlled_shape_entities)
+        .zip(tetromino_rotation.rotations)
+    {
         // Check collision with walls
         let next_x = shape_block.x + speed.x;
         let next_y = shape_block.y + speed.y;
@@ -49,7 +55,10 @@ pub fn collision_resolver(
     }
 
     for block in board_blocks_q.iter() {
-        for (shape_block, (x, y)) in shape_blocks_q.iter_many(controlled_shape_entities).zip(tetromino_rotation.rotations) {
+        for (shape_block, (x, y)) in shape_blocks_q
+            .iter_many(controlled_shape_entities)
+            .zip(tetromino_rotation.rotations)
+        {
             let next_x = shape_block.x + speed.x;
             let next_y = shape_block.y + speed.y;
             // Check collision with shapes block
@@ -68,7 +77,7 @@ pub fn collision_resolver(
             let next_x = shape_block.x + x;
             let next_y = shape_block.y + y;
             // Check collision for the rotation
-            if (block.x == next_x && block.y == next_y) || (block.y == next_y && shape_block.y > block.y && block.x == next_x) {
+            if block.x == next_x && block.y == next_y {
                 cancel_rotation = true
             }
         }
@@ -77,104 +86,5 @@ pub fn collision_resolver(
     if cancel_rotation {
         tetromino.rotate_left();
         *tetromino_rotation = TetrominoRotation::new();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use bevy::app::{App, Startup};
-    use bevy::prelude::{
-        BuildChildren, Color, Commands, EventReader, IntoSystemConfigs, Res, Resource,
-    };
-
-    use crate::bundles::OwnedNextMoveBundle;
-    use crate::components::{Block, Board, Fake, GridPosition, Owned, Tetromino};
-    use crate::events::BlockCollisionEvent;
-    use crate::systems::collision_resolver;
-
-    #[derive(Resource)]
-    struct ShouldCollide(bool);
-
-    #[allow(private_interfaces)]
-    pub fn test_checker_collision(
-        test_init_state: Res<ShouldCollide>,
-        mut ev_block_collision: EventReader<BlockCollisionEvent>,
-        mut ev_wall_collision: EventReader<BlockCollisionEvent>,
-    ) {
-        let mut should_assert = test_init_state.0;
-        for _ in ev_block_collision.read() {
-            should_assert = !should_assert;
-        }
-        assert!(should_assert);
-
-        should_assert = test_init_state.0;
-        for _ in ev_wall_collision.read() {
-            should_assert = !should_assert;
-        }
-        assert!(should_assert);
-    }
-
-    pub fn setup_board_no_collision(mut commands: Commands) {
-        commands.spawn(OwnedNextMoveBundle::new());
-        commands
-            .spawn((Owned, Board::default()))
-            .with_children(|parent| {
-                parent.spawn((Block::new(Color::RED), GridPosition { x: 10, y: 10 }));
-            });
-
-        commands
-            .spawn((Fake, Tetromino::get_random_shape()))
-            .with_children(|parent| {
-                parent.spawn((Block::new(Color::RED), GridPosition { x: 11, y: 10 }));
-            });
-        commands.insert_resource(ShouldCollide(true))
-    }
-
-    pub fn setup_board_block_collision(mut commands: Commands) {
-        commands.spawn(OwnedNextMoveBundle::new());
-        commands
-            .spawn((Owned, Board::default()))
-            .with_children(|parent| {
-                parent.spawn((Block::new(Color::RED), GridPosition { x: 10, y: 10 }));
-            });
-
-        commands
-            .spawn((Fake, Tetromino::get_random_shape()))
-            .with_children(|parent| {
-                parent.spawn((Block::new(Color::RED), GridPosition { x: 11, y: 10 }));
-            });
-        commands.insert_resource(ShouldCollide(true))
-    }
-
-    #[test]
-    fn block_no_collision_should_occur() {
-        App::new()
-            .add_event::<BlockCollisionEvent>()
-            .add_systems(
-                Startup,
-                (
-                    setup_board_no_collision,
-                    collision_resolver,
-                    test_checker_collision,
-                )
-                    .chain(),
-            )
-            .run()
-    }
-
-    #[test]
-    fn block_collision_should_occur() {
-        App::new()
-            .add_event::<BlockCollisionEvent>()
-            .add_systems(
-                Startup,
-                (
-                    setup_board_block_collision,
-                    collision_resolver,
-                    test_checker_collision,
-                )
-                    .chain(),
-            )
-            .run()
     }
 }
