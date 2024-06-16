@@ -66,17 +66,21 @@ pub fn keyboard_iter(
     if gravity_timer.timer.finished() {
         if keys.pressed(KeyCode::ArrowRight) {
             movement_event.send(MovementEvent::Right);
+            gravity_timer.timer.reset();
         }
         if keys.pressed(KeyCode::ArrowLeft) {
             movement_event.send(MovementEvent::Left);
+            gravity_timer.timer.reset();
         }
         if keys.pressed(KeyCode::ArrowDown) {
             movement_event.send(MovementEvent::Down);
+            gravity_timer.timer.reset();
         }
     }
     if rotation_timer.timer.finished() {
-        if keys.pressed(KeyCode::ArrowUp) || keys.just_pressed(KeyCode::ArrowUp) {
+        if keys.pressed(KeyCode::ArrowUp) {
             movement_event.send(MovementEvent::RotationRight);
+            rotation_timer.timer.reset();
         }
     }
 }
@@ -189,13 +193,13 @@ fn setup_game(mut commands: Commands, window: Query<&Window>, score: Query<&Scor
     commands.spawn(MovementTimer {
         timer: Timer::new(
             Duration::from_millis(TIME_BETWEEN_MOVEMENT),
-            TimerMode::Repeating,
+            TimerMode::Once,
         ),
     });
     commands.spawn(RotationTimer {
         timer: Timer::new(
             Duration::from_millis(TIME_BETWEEN_ROTATION),
-            TimerMode::Repeating,
+            TimerMode::Once,
         ),
     });
 
