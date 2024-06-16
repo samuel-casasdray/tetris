@@ -9,6 +9,8 @@ use crate::shapes::{Shape, ShapePosition};
 pub struct Board {
     pub height: usize,
     pub width: usize,
+    pub enable_gravity: bool,
+    pub level: u8,
 }
 
 impl Default for Board {
@@ -16,6 +18,8 @@ impl Default for Board {
         Board {
             height: 20,
             width: 10,
+            enable_gravity: true,
+            level: 0,
         }
     }
 }
