@@ -39,8 +39,20 @@ impl Tetromino {
         }
     }
 
+    pub fn get_rotation_left(&self) -> u8 {
+        if self.rotation == 0 {
+            3
+        } else {
+            self.rotation - 1
+        }
+    }
+
     pub fn rotate_right(&mut self) {
         self.rotation = (self.rotation + 1) % 4;
+    }
+
+    pub fn get_rotation_right(&self) -> u8 {
+        (self.rotation + 1) % 4
     }
     pub fn get_random_shape() -> Self {
         let mut rng = rand::thread_rng();
@@ -124,17 +136,7 @@ pub struct TetrominoSpeed {
 }
 
 #[derive(Debug, Component)]
-pub struct TetrominoRotation {
-    pub rotations: [(i32, i32); 4],
-}
-
-impl TetrominoRotation {
-    pub fn new() -> Self {
-        Self {
-            rotations: [(0, 0); 4],
-        }
-    }
-}
+pub struct TetrominoRotateTo(pub Option<u8>);
 
 #[derive(Debug, Component)]
 pub struct Score {
@@ -155,7 +157,7 @@ impl Score {
             1 => 40,
             2 => 100,
             3 => 300,
-            _ => 1200
+            _ => 1200,
         } * (self.level + 1) as u64;
     }
 }

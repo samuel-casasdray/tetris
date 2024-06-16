@@ -1,26 +1,30 @@
 use bevy::prelude::{Query, With};
 
-use crate::components::{Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotation, TetrominoSpeed};
+use crate::components::{
+    Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotateTo, TetrominoSpeed,
+};
 
 pub fn tetromino_next_move_validator(
-    mut next_move_q: Query<&mut TetrominoSpeed, With<Owned>>,
-    mut controlled_shape_q: Query<&mut GridPosition, (With<Owned>, With<Tetromino>)>,
-    mut tetromino_rotation: Query<&mut TetrominoRotation, With<Owned>>,
+    mut tetromino_speed_q: Query<&mut TetrominoSpeed, With<Owned>>,
+    mut tetromino_rotation: Query<&mut TetrominoRotateTo, With<Owned>>,
+    mut controlled_shape_position_q: Query<(&mut GridPosition, &mut Tetromino), With<Owned>>,
     mut controlled_shape_block: Query<&mut RelativeGridPosition, (With<Owned>, With<Block>)>,
 ) {
-    let mut next_move = next_move_q.single_mut();
+    let mut next_move = tetromino_speed_q.single_mut();
     let mut tetromino_rotation = tetromino_rotation.single_mut();
 
-    for mut controlled_shape in controlled_shape_q.iter_mut() {
-        controlled_shape.x += next_move.x;
-        controlled_shape.y += next_move.y;
-    }
+    let (mut tetromino_position, mut tetromino) = controlled_shape_position_q.single_mut();
+    tetromino_position.x += next_move.x;
+    tetromino_position.y += next_move.y;
 
-    for (mut controlled_shape, (x, y)) in controlled_shape_block.iter_mut().zip(tetromino_rotation.rotations) {
-        controlled_shape.x += x;
-        controlled_shape.y += y;
+    if let Some(rotation) = tetromino_rotation.0 {
+        tetromino.rotation = rotation;
+        let blocks = tetromino.shape.get_blocks(rotation);
+        for (index, mut tetromino_block_position) in controlled_shape_block.iter_mut().enumerate() {
+            *tetromino_block_position = blocks[index].clone();
+        }
     }
 
     *next_move = TetrominoSpeed { x: 0, y: 0 };
-    *tetromino_rotation = TetrominoRotation::new();
+    *tetromino_rotation = TetrominoRotateTo(None);
 }

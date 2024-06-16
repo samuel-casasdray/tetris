@@ -86,18 +86,4 @@ impl Shape {
             Shape::S => Color::PINK,
         }
     }
-    // fn rotate_shape(&self, rotation: u8) -> ShapePosition {
-    //     let base_shape = shape_z();
-    //     let center: (i32, i32) = (base_shape.1.x, base_shape.1.y);
-    //     return [(0, 0).into(), (0, 0).into(), (0, 0).into(), (0, 0).into()]
-    // }
-    //
-    // fn rotation(x: i32, y: i32, center_x: i32, center_y: i32, rotation: u8) -> (i32, i32) {
-    //     match rotation {
-    //         0 => (x, y),
-    //         1 => (-y, x),
-    //         2 => (2 * center_x - x, 2 * center_y - y),
-    //         _ => ()
-    //     }
-    // }
 }
