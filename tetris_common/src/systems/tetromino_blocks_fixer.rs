@@ -1,6 +1,6 @@
 use bevy::prelude::{BuildChildren, Children, Commands, Entity, EventReader, Query, With};
 
-use crate::components::{Block, Board, Owned, RelativeGridPosition, Tetromino};
+use crate::components::{Block, Board, Owned, RelativeGridPosition, Tetromino, TetrominoShadow};
 use crate::events::BlockCollisionEvent;
 
 pub fn tetromino_blocks_fixer(
@@ -22,7 +22,7 @@ pub fn tetromino_blocks_fixer(
                         .set_parent(board_entity);
                 }
             }
-            commands.entity(entity).despawn();
+            commands.entity(entity).remove::<TetrominoShadow>().despawn();
         }
     }
 }

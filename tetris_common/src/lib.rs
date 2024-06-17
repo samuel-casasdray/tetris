@@ -4,7 +4,7 @@ use crate::events::{BlockCollisionEvent, MovementEvent};
 use crate::systems::{
     collision_resolver, line_remove, movement_system, relative_position_system,
     setup_board, tetromino_blocks_fixer, tetromino_gravity_system,
-    tetromino_next_move_validator, tetromino_spawner,
+    tetromino_next_move_validator, tetromino_spawner, shadow_movement
 };
 
 mod bundles;
@@ -30,7 +30,8 @@ impl Plugin for CommonPlugin {
                     collision_resolver,
                     tetromino_next_move_validator,
                     tetromino_blocks_fixer,
-                    line_remove
+                    line_remove,
+                    shadow_movement
                 )
                     .chain(),
             );

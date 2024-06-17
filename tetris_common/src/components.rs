@@ -5,6 +5,9 @@ use rand::Rng;
 
 use crate::shapes::{Shape, ShapePosition};
 
+pub const DEFAULT_BOARD_WIDTH: usize = 10;
+pub const DEFAULT_BOARD_HEIGHT: usize = 20;
+
 #[derive(Debug, Component)]
 pub struct Board {
     pub height: usize,
@@ -16,8 +19,8 @@ pub struct Board {
 impl Default for Board {
     fn default() -> Self {
         Board {
-            height: 20,
-            width: 10,
+            height: DEFAULT_BOARD_HEIGHT,
+            width: DEFAULT_BOARD_WIDTH,
             enable_gravity: true,
             level: 0,
         }
@@ -28,6 +31,11 @@ impl Default for Board {
 pub struct Tetromino {
     pub rotation: u8,
     pub shape: Shape,
+}
+
+#[derive(Debug, Component, Clone)]
+pub struct TetrominoShadow {
+    pub tetromino: Tetromino
 }
 
 impl Tetromino {

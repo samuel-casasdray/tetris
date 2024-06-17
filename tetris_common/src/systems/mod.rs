@@ -7,6 +7,7 @@ pub use relative_position::relative_position_system;
 pub use tetromino_blocks_fixer::tetromino_blocks_fixer;
 pub use tetromino_next_move_validator::tetromino_next_move_validator;
 pub use tetromino_spawner::tetromino_spawner;
+pub use shadow_movement::shadow_movement;
 
 mod board_setup;
 mod collision;
@@ -17,3 +18,4 @@ mod tetromino_blocks_fixer;
 mod tetromino_next_move_validator;
 mod tetromino_spawner;
 mod line_remove;
+mod shadow_movement;
