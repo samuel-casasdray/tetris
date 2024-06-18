@@ -1,13 +1,13 @@
 use bevy::prelude::Color;
 
 use crate::components::RelativeGridPosition;
-use crate::shapes::shape_i::{shape_i1, shape_i2, shape_i3, shape_i4};
-use crate::shapes::shape_j::{shape_j1, shape_j2, shape_j3, shape_j4};
-use crate::shapes::shape_l::{shape_l1, shape_l2, shape_l3, shape_l4};
-use crate::shapes::shape_o::shape_o;
-use crate::shapes::shape_s::{shape_s1, shape_s2, shape_s3, shape_s4};
-use crate::shapes::shape_t::{shape_t1, shape_t2, shape_t3, shape_t4};
-use crate::shapes::shape_z::{shape_z1, shape_z2, shape_z3, shape_z4};
+use crate::tetromino::shapes::shape_i::{shape_i1, shape_i2, shape_i3, shape_i4};
+use crate::tetromino::shapes::shape_j::{shape_j1, shape_j2, shape_j3, shape_j4};
+use crate::tetromino::shapes::shape_l::{shape_l1, shape_l2, shape_l3, shape_l4};
+use crate::tetromino::shapes::shape_o::shape_o;
+use crate::tetromino::shapes::shape_s::{shape_s1, shape_s2, shape_s3, shape_s4};
+use crate::tetromino::shapes::shape_t::{shape_t1, shape_t2, shape_t3, shape_t4};
+use crate::tetromino::shapes::shape_z::{shape_z1, shape_z2, shape_z3, shape_z4};
 
 mod shape_i;
 mod shape_j;

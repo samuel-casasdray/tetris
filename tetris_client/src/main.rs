@@ -8,7 +8,7 @@ use tetris_common::CommonPlugin;
 use tetris_common::components::{
     Block, Board, GridPosition, MovementTimer, Owned, RotationTimer, Score, ScoreText,
 };
-use tetris_common::events::MovementEvent;
+use tetris_common::tetromino::events::MovementEvent;
 
 use crate::board_ui_calculator::{
     BoardUICalculator, DEFAULT_BOARD_HEIGHT, DEFAULT_BOARD_WIDTH, get_window_position,

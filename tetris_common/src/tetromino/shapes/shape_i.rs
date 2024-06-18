@@ -1,4 +1,4 @@
-use crate::shapes::ShapePosition;
+use crate::tetromino::shapes::ShapePosition;
 
 pub fn shape_i1() -> ShapePosition {
     [(0, 2).into(), (1, 2).into(), (2, 2).into(), (3, 2).into()]

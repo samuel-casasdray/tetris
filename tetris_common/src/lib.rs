@@ -1,17 +1,16 @@
 use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup};
 
-use crate::events::{BlockCollisionEvent, MovementEvent};
-use crate::systems::{
-    collision_resolver, line_remove, movement_system, relative_position_system,
-    setup_board, tetromino_blocks_fixer, tetromino_gravity_system,
-    tetromino_next_move_validator, tetromino_spawner, shadow_movement
+use crate::board::systems::{line_remove, relative_position_system, setup_board};
+use crate::tetromino::events::{BlockCollisionEvent, MovementEvent};
+use crate::tetromino::systems::{
+    collision_resolver, movement_system, shadow_movement, tetromino_blocks_fixer,
+    tetromino_gravity_system, tetromino_next_move_validator, tetromino_spawner,
 };
 
-mod bundles;
+pub mod board;
+pub mod bundles;
 pub mod components;
-pub mod events;
-mod shapes;
-pub mod systems;
+pub mod tetromino;
 
 pub struct CommonPlugin;
 
@@ -31,7 +30,7 @@ impl Plugin for CommonPlugin {
                     tetromino_next_move_validator,
                     tetromino_blocks_fixer,
                     line_remove,
-                    shadow_movement
+                    shadow_movement,
                 )
                     .chain(),
             );
@@ -43,11 +42,15 @@ mod tests {
     use std::time::Duration;
 
     use bevy::app::{App, Startup};
-    use bevy::prelude::{BuildChildren, Color, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Timer, TimerMode, Update, With};
+    use bevy::prelude::{
+        BuildChildren, Color, Commands, Entity, IntoSystemConfigs, Query, SpatialBundle, Timer,
+        TimerMode, Update, With,
+    };
     use term_grid::{Cell, Direction, Filling, Grid, GridOptions};
 
+    use crate::board::systems::relative_position_system;
     use crate::components::{Block, Board, GravityTimer, GridPosition, Owned, Tetromino};
-    use crate::systems::{relative_position_system, tetromino_gravity_system};
+    use crate::tetromino::systems::tetromino_gravity_system;
 
     #[test]
     fn terminal_test() {
@@ -83,7 +86,9 @@ mod tests {
                 for relative_positions in positions {
                     child.spawn((
                         Owned,
-                        Block { color: Color::ORANGE },
+                        Block {
+                            color: Color::ORANGE,
+                        },
                         relative_positions,
                         GridPosition { x: 0, y: 0 },
                     ));
@@ -106,7 +111,9 @@ mod tests {
                 commands
                     .spawn((
                         Owned,
-                        Block { color: Color::ORANGE },
+                        Block {
+                            color: Color::ORANGE,
+                        },
                         GridPosition {
                             x: x as i32,
                             y: y as i32,

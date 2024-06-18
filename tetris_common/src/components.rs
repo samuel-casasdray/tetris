@@ -3,7 +3,7 @@ use std::fmt::Display;
 use bevy::prelude::{Color, Component, Timer};
 use rand::Rng;
 
-use crate::shapes::{Shape, ShapePosition};
+use crate::tetromino::shapes::{Shape, ShapePosition};
 
 pub const DEFAULT_BOARD_WIDTH: usize = 10;
 pub const DEFAULT_BOARD_HEIGHT: usize = 20;
@@ -35,7 +35,7 @@ pub struct Tetromino {
 
 #[derive(Debug, Component, Clone)]
 pub struct TetrominoShadow {
-    pub tetromino: Tetromino
+    pub tetromino: Tetromino,
 }
 
 impl Tetromino {
