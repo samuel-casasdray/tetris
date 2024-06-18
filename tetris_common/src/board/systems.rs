@@ -5,10 +5,10 @@ use bevy::prelude::{
     Commands, Entity, EventReader, Query, SpatialBundle, Timer, TimerMode, With, Without,
 };
 
-use crate::bundles::OwnedTetrominoPhysics;
-use crate::components::{
-    Block, Board, GravityTimer, GridPosition, Owned, RelativeGridPosition, Score,
-};
+use crate::board::components::{Block, Board, GridPosition, RelativeGridPosition};
+use crate::components::{Owned, Score};
+use crate::tetromino::bundles::OwnedTetrominoPhysics;
+use crate::tetromino::components::GravityTimer;
 use crate::tetromino::events::BlockCollisionEvent;
 
 pub fn setup_board(mut commands: Commands) {

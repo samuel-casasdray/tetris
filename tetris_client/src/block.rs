@@ -2,7 +2,7 @@ use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Color, default, Sprite, Transform};
 use bevy::sprite::SpriteBundle;
 
-use tetris_common::components::GridPosition;
+use tetris_common::board::components::GridPosition;
 
 use crate::board_ui_calculator::BoardUICalculator;
 

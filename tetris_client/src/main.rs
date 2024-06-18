@@ -4,10 +4,10 @@ use bevy::prelude::*;
 use bevy::window::WindowResized;
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
+use tetris_common::board::components::{Block, Board, GridPosition};
 use tetris_common::CommonPlugin;
-use tetris_common::components::{
-    Block, Board, GridPosition, MovementTimer, Owned, RotationTimer, Score, ScoreText,
-};
+use tetris_common::components::{Owned, Score, ScoreText};
+use tetris_common::tetromino::components::{MovementTimer, RotationTimer};
 use tetris_common::tetromino::events::MovementEvent;
 
 use crate::board_ui_calculator::{

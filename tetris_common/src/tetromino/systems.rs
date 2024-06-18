@@ -7,11 +7,15 @@ use bevy::prelude::{
     With, Without,
 };
 
+use crate::board::bundles::OwnedRelativeBlockBundle;
+use crate::board::components::{
+    Block, Board, DEFAULT_BOARD_HEIGHT, GridPosition, RelativeGridPosition,
+};
 use crate::board::systems::get_grid_position;
-use crate::bundles::{OwnedRelativeBlockBundle, OwnedTetrominoBundle};
-use crate::components::{
-    Block, Board, DEFAULT_BOARD_HEIGHT, GravityTimer, GridPosition, Owned, RelativeGridPosition,
-    Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed,
+use crate::components::Owned;
+use crate::tetromino::bundles::OwnedTetrominoBundle;
+use crate::tetromino::components::{
+    GravityTimer, Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed,
 };
 use crate::tetromino::events::{BlockCollisionEvent, MovementEvent};
 

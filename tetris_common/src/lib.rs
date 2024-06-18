@@ -8,7 +8,6 @@ use crate::tetromino::systems::{
 };
 
 pub mod board;
-pub mod bundles;
 pub mod components;
 pub mod tetromino;
 
@@ -48,8 +47,10 @@ mod tests {
     };
     use term_grid::{Cell, Direction, Filling, Grid, GridOptions};
 
+    use crate::board::components::{Block, Board, GridPosition};
     use crate::board::systems::relative_position_system;
-    use crate::components::{Block, Board, GravityTimer, GridPosition, Owned, Tetromino};
+    use crate::components::Owned;
+    use crate::tetromino::components::{GravityTimer, Tetromino};
     use crate::tetromino::systems::tetromino_gravity_system;
 
     #[test]

@@ -1,6 +1,8 @@
-use bevy::prelude::{Bundle, Color};
+use bevy::prelude::Bundle;
 
-use crate::components::{Block, GridPosition, Owned, RelativeGridPosition, Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed};
+use crate::board::components::{GridPosition, RelativeGridPosition};
+use crate::components::Owned;
+use crate::tetromino::components::{Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed};
 
 #[derive(Bundle)]
 pub struct OwnedTetrominoBundle {
@@ -18,44 +20,15 @@ impl OwnedTetrominoBundle {
             tetromino: tetromino.clone(),
             tetromino_shadow: TetrominoShadow { tetromino },
             grid_position: grid_position.clone(),
-            grid_position_shadow: RelativeGridPosition { x: grid_position.x, y: grid_position.y },
+            grid_position_shadow: RelativeGridPosition {
+                x: grid_position.x,
+                y: grid_position.y,
+            },
         }
     }
 
     pub fn new_random(grid_position: GridPosition) -> Self {
         Self::new(grid_position, Tetromino::get_random_shape())
-    }
-}
-
-#[derive(Bundle)]
-pub struct OwnedRelativeBlockBundle {
-    owned_block_bundle: OwnedBlockBundle,
-    relative_grid_position: RelativeGridPosition,
-}
-
-impl OwnedRelativeBlockBundle {
-    pub fn new(relative_grid_position: RelativeGridPosition, color: Color) -> Self {
-        Self {
-            relative_grid_position,
-            owned_block_bundle: OwnedBlockBundle::new((0, 0).into(), color),
-        }
-    }
-}
-
-#[derive(Bundle)]
-pub struct OwnedBlockBundle {
-    owned: Owned,
-    block: Block,
-    grid_position: GridPosition,
-}
-
-impl OwnedBlockBundle {
-    pub fn new(grid_position: GridPosition, color: Color) -> Self {
-        Self {
-            owned: Owned,
-            block: Block::new(color),
-            grid_position,
-        }
     }
 }
 
