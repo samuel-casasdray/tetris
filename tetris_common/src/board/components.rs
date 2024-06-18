@@ -46,7 +46,7 @@ impl From<(i32, i32)> for GridPosition {
     }
 }
 
-#[derive(Debug, Component, Clone)]
+#[derive(Debug, Component, Clone, Default)]
 pub struct RelativeGridPosition {
     pub x: i32,
     pub y: i32,

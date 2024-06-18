@@ -2,7 +2,7 @@ use bevy::prelude::Bundle;
 
 use crate::board::components::{GridPosition, RelativeGridPosition};
 use crate::components::Owned;
-use crate::tetromino::components::{Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed};
+use crate::tetromino::components::{Tetromino, TetrominoShadow};
 
 #[derive(Bundle)]
 pub struct OwnedTetrominoBundle {
@@ -29,22 +29,5 @@ impl OwnedTetrominoBundle {
 
     pub fn new_random(grid_position: GridPosition) -> Self {
         Self::new(grid_position, Tetromino::get_random_shape())
-    }
-}
-
-#[derive(Bundle)]
-pub struct OwnedTetrominoPhysics {
-    owned: Owned,
-    next_move: TetrominoSpeed,
-    next_rotation: TetrominoRotateTo,
-}
-
-impl OwnedTetrominoPhysics {
-    pub fn new() -> Self {
-        Self {
-            owned: Owned,
-            next_move: TetrominoSpeed { x: 0, y: 0 },
-            next_rotation: TetrominoRotateTo(None),
-        }
     }
 }

@@ -7,7 +7,6 @@ use bevy::prelude::{
 
 use crate::board::components::{Block, Board, GridPosition, RelativeGridPosition};
 use crate::components::{Owned, Score};
-use crate::tetromino::bundles::OwnedTetrominoPhysics;
 use crate::tetromino::components::GravityTimer;
 use crate::tetromino::events::BlockCollisionEvent;
 
@@ -15,7 +14,6 @@ pub fn setup_board(mut commands: Commands) {
     commands
         .spawn((Owned, Board::default(), SpatialBundle::default()))
         .with_children(|builder| {
-            builder.spawn(OwnedTetrominoPhysics::new());
             builder.spawn(GravityTimer {
                 timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
             });

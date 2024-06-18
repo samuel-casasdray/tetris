@@ -10,13 +10,13 @@ pub struct Owned;
 #[derive(Debug, Component)]
 pub struct Fake;
 
-#[derive(Debug, Component)]
+#[derive(Component)]
+pub struct ScoreText;
+
+#[derive(Debug, Component, Default)]
 pub struct Score {
     pub score: u64,
 }
-
-#[derive(Component)]
-pub struct ScoreText;
 
 impl Score {
     pub fn new() -> Self {

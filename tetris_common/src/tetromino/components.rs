@@ -59,15 +59,6 @@ impl Tetromino {
 }
 
 #[derive(Debug, Component)]
-pub struct TetrominoSpeed {
-    pub x: i32,
-    pub y: i32,
-}
-
-#[derive(Debug, Component)]
-pub struct TetrominoRotateTo(pub Option<u8>);
-
-#[derive(Debug, Component)]
 pub struct GravityTimer {
     pub timer: Timer,
 }

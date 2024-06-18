@@ -1,7 +1,7 @@
 use std::cmp::min;
 
 use bevy::hierarchy::Children;
-use bevy::log::info;
+use bevy::log::{debug, info};
 use bevy::prelude::{
     BuildChildren, Commands, Entity, EventReader, EventWriter, Query, Res, SpatialBundle, Time,
     With, Without,
@@ -14,10 +14,10 @@ use crate::board::components::{
 use crate::board::systems::get_grid_position;
 use crate::components::Owned;
 use crate::tetromino::bundles::OwnedTetrominoBundle;
-use crate::tetromino::components::{
-    GravityTimer, Tetromino, TetrominoRotateTo, TetrominoShadow, TetrominoSpeed,
+use crate::tetromino::components::{GravityTimer, Tetromino, TetrominoShadow};
+use crate::tetromino::events::{
+    BlockCollisionEvent, MovementEvent, NewTetrominoPositionEvent, TetrominoMovementEvent,
 };
-use crate::tetromino::events::{BlockCollisionEvent, MovementEvent};
 
 pub fn tetromino_spawner(
     mut commands: Commands,
@@ -56,28 +56,31 @@ pub fn tetromino_spawner(
 }
 
 pub fn tetromino_next_move_validator(
-    mut tetromino_speed_q: Query<&mut TetrominoSpeed, With<Owned>>,
-    mut tetromino_rotation: Query<&mut TetrominoRotateTo, With<Owned>>,
     mut controlled_shape_position_q: Query<(&mut GridPosition, &mut Tetromino), With<Owned>>,
     mut controlled_shape_block: Query<&mut RelativeGridPosition, (With<Owned>, With<Block>)>,
+    mut new_tetromino_position_ev: EventReader<NewTetrominoPositionEvent>,
 ) {
-    let mut next_move = tetromino_speed_q.single_mut();
-    let mut tetromino_rotation = tetromino_rotation.single_mut();
+    for NewTetrominoPositionEvent {
+        relative_position,
+        rotation,
+    } in new_tetromino_position_ev.read()
+    {
+        let next_move = relative_position.clone().unwrap_or_default();
+        let tetromino_rotation = rotation;
+        let (mut tetromino_position, mut tetromino) = controlled_shape_position_q.single_mut();
+        tetromino_position.x += next_move.x;
+        tetromino_position.y += next_move.y;
 
-    let (mut tetromino_position, mut tetromino) = controlled_shape_position_q.single_mut();
-    tetromino_position.x += next_move.x;
-    tetromino_position.y += next_move.y;
-
-    if let Some(rotation) = tetromino_rotation.0 {
-        tetromino.rotation = rotation;
-        let blocks = tetromino.shape.get_blocks(rotation);
-        for (index, mut tetromino_block_position) in controlled_shape_block.iter_mut().enumerate() {
-            *tetromino_block_position = blocks[index].clone();
+        if let Some(rotation) = tetromino_rotation {
+            tetromino.rotation = *rotation;
+            let blocks = tetromino.shape.get_blocks(*rotation);
+            for (index, mut tetromino_block_position) in
+                controlled_shape_block.iter_mut().enumerate()
+            {
+                *tetromino_block_position = blocks[index].clone();
+            }
         }
     }
-
-    *next_move = TetrominoSpeed { x: 0, y: 0 };
-    *tetromino_rotation = TetrominoRotateTo(None);
 }
 
 pub fn tetromino_blocks_fixer(
@@ -159,33 +162,43 @@ pub fn shadow_movement(
 }
 
 pub fn movement_system(
-    mut movement_event: EventReader<MovementEvent>,
-    mut next_move_q: Query<&mut TetrominoSpeed, With<Owned>>,
+    mut movement_event_reader: EventReader<MovementEvent>,
     mut tetromino: Query<&mut Tetromino, With<Owned>>,
-    mut tetromino_rotation: Query<&mut TetrominoRotateTo, With<Owned>>,
+    mut new_tetromino_movement_writer: EventWriter<TetrominoMovementEvent>,
 ) {
-    let mut next_move = next_move_q.single_mut();
-
-    for movement in movement_event.read() {
+    for movement in movement_event_reader.read() {
         match movement {
             MovementEvent::Right => {
-                next_move.x += 1;
+                new_tetromino_movement_writer.send(TetrominoMovementEvent {
+                    relative_position: Some(RelativeGridPosition { x: 1, y: 0 }),
+                    rotation: None,
+                });
             }
             MovementEvent::Left => {
-                next_move.x -= 1;
+                new_tetromino_movement_writer.send(TetrominoMovementEvent {
+                    relative_position: Some(RelativeGridPosition { x: -1, y: 0 }),
+                    rotation: None,
+                });
             }
             MovementEvent::Down => {
-                next_move.y -= 1;
+                new_tetromino_movement_writer.send(TetrominoMovementEvent {
+                    relative_position: Some(RelativeGridPosition { x: 0, y: -1 }),
+                    rotation: None,
+                });
             }
             MovementEvent::RotationRight => {
-                let mut rotation = tetromino_rotation.single_mut();
                 let tetromino = tetromino.single_mut();
-                rotation.0 = Some(tetromino.get_rotation_right());
+                new_tetromino_movement_writer.send(TetrominoMovementEvent {
+                    relative_position: None,
+                    rotation: Some(tetromino.get_rotation_right()),
+                });
             }
             MovementEvent::RotationLeft => {
-                let mut rotation = tetromino_rotation.single_mut();
                 let tetromino = tetromino.single_mut();
-                rotation.0 = Some(tetromino.get_rotation_left());
+                new_tetromino_movement_writer.send(TetrominoMovementEvent {
+                    relative_position: None,
+                    rotation: Some(tetromino.get_rotation_left()),
+                });
             }
         }
     }
@@ -194,8 +207,8 @@ pub fn movement_system(
 pub fn tetromino_gravity_system(
     time: Res<Time>,
     mut gravity_timer_q: Query<&mut GravityTimer>,
-    mut next_move_q: Query<&mut TetrominoSpeed, With<Owned>>,
     board_q: Query<&Board, With<Owned>>,
+    mut new_tetromino_position: EventWriter<TetrominoMovementEvent>,
 ) {
     if !board_q.single().enable_gravity {
         return;
@@ -205,8 +218,10 @@ pub fn tetromino_gravity_system(
     gravity_timer.timer.tick(time.delta());
 
     if gravity_timer.timer.finished() {
-        let mut next_move = next_move_q.single_mut();
-        next_move.y -= 1;
+        new_tetromino_position.send(TetrominoMovementEvent {
+            relative_position: Some(RelativeGridPosition { x: 0, y: -1 }),
+            rotation: None,
+        });
     }
 }
 
@@ -215,75 +230,103 @@ pub fn collision_resolver(
     tetromino_q: Query<(&Tetromino, &GridPosition, &Children), With<Owned>>,
     board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
     shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
-    mut tetromino_speed_q: Query<&mut TetrominoSpeed, With<Owned>>,
-    mut tetromino_rotation: Query<&mut TetrominoRotateTo, With<Owned>>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
+    mut tetromino_movement_ev: EventReader<TetrominoMovementEvent>,
+    mut new_tetromino_position_ev: EventWriter<NewTetrominoPositionEvent>,
 ) {
     let (tetromino, tetromino_position, tetromino_children) = match tetromino_q.get_single() {
         Ok(query) => query,
         Err(_) => return,
     };
 
-    let mut tetromino_speed = tetromino_speed_q.single_mut();
-    let mut tetromino_rotation = tetromino_rotation.single_mut();
+    'event_loop: for TetrominoMovementEvent {
+        relative_position,
+        rotation,
+    } in tetromino_movement_ev.read()
+    {
+        let mut new_position_to_send = NewTetrominoPositionEvent {
+            relative_position: relative_position.clone(),
+            rotation: *rotation,
+        };
+        // Get the tetromino's blocks with the rotation applied if any
+        let tetromino_blocks: Vec<GridPosition> = if let Some(rotation) = rotation {
+            let relative_blocks = tetromino.shape.get_blocks(*rotation);
+            relative_blocks
+                .iter()
+                .map(|block| get_grid_position(block, tetromino_position))
+                .collect()
+        } else {
+            shape_blocks_q
+                .iter_many(tetromino_children)
+                .cloned()
+                .collect()
+        };
 
-    // Get the tetromino's blocks with the rotation applied if any
-    let tetromino_blocks: Vec<GridPosition> = if let Some(rotation) = tetromino_rotation.0 {
-        let relative_blocks = tetromino.shape.get_blocks(rotation);
-        relative_blocks
-            .iter()
-            .map(|block| get_grid_position(block, tetromino_position))
-            .collect()
-    } else {
-        shape_blocks_q
-            .iter_many(tetromino_children)
-            .cloned()
-            .collect()
-    };
-
-    let board = board_q.single();
-    for shape_block in tetromino_blocks.iter() {
-        let next_x = shape_block.x + tetromino_speed.x;
-        let next_y = shape_block.y + tetromino_speed.y;
-
-        // Check collision with bottom wall
-        if next_y < 0 {
-            tetromino_speed.y = 0;
-            tetromino_rotation.0 = None;
-            info!("Bottom wall collision");
-            ev_block_collision.send(BlockCollisionEvent);
-            return;
-        }
-
-        // Check collision with left/right wall
-        if next_x >= board.width as i32 || next_x < 0 {
-            info!("Left/Right wall collision");
-            tetromino_speed.x = 0;
-            tetromino_rotation.0 = None;
-        }
-    }
-
-    for block in board_blocks_q.iter() {
+        let board = board_q.single();
         for shape_block in tetromino_blocks.iter() {
-            let next_x = shape_block.x + tetromino_speed.x;
-            let next_y = shape_block.y + tetromino_speed.y;
+            let (next_x, next_y) = if let Some(position) = relative_position {
+                (shape_block.x + position.x, shape_block.y + position.y)
+            } else {
+                (shape_block.x, shape_block.y)
+            };
 
-            // Check collision with blocks
-            if block.x == next_x && block.y == next_y {
-                info!("block collision in {:?} {:?}", block, shape_block);
-                tetromino_speed.x = 0;
-                tetromino_rotation.0 = None;
-            }
-
-            // Check collision with blocks when shape comes from the top
-            if block.y == next_y && shape_block.y > block.y && block.x == next_x {
-                tetromino_speed.x = 0;
-                tetromino_speed.y = 0;
-                tetromino_rotation.0 = None;
-                info!("Block collision from top in {:?} {:?}", block, shape_block);
+            // Check collision with bottom wall
+            if next_y < 0 {
+                if let Some(p) = new_position_to_send.relative_position.as_mut() {
+                    p.y = 0;
+                }
+                new_position_to_send.rotation = None;
+                info!("Bottom wall collision");
                 ev_block_collision.send(BlockCollisionEvent);
-                return;
+                continue 'event_loop;
             }
+
+            // Check collision with left/right wall
+            if next_x >= board.width as i32 || next_x < 0 {
+                info!("Left/Right wall collision");
+                if let Some(p) = new_position_to_send.relative_position.as_mut() {
+                    p.x = 0;
+                }
+                new_position_to_send.rotation = None;
+            }
+        }
+
+        for block in board_blocks_q.iter() {
+            for shape_block in tetromino_blocks.iter() {
+                let (next_x, next_y) = if let Some(position) = relative_position {
+                    (shape_block.x + position.x, shape_block.y + position.y)
+                } else {
+                    (shape_block.x, shape_block.y)
+                };
+
+                // Check collision with blocks
+                if block.x == next_x && block.y == next_y {
+                    info!("block collision in {:?} {:?}", block, shape_block);
+                    if let Some(p) = new_position_to_send.relative_position.as_mut() {
+                        p.x = 0;
+                    }
+                    new_position_to_send.rotation = None;
+                }
+
+                // Check collision with blocks when shape comes from the top
+                if block.y == next_y && shape_block.y > block.y && block.x == next_x {
+                    if let Some(p) = new_position_to_send.relative_position.as_mut() {
+                        p.x = 0;
+                        p.y = 0;
+                    }
+                    new_position_to_send.rotation = None;
+                    info!("Block collision from top in {:?} {:?}", block, shape_block);
+                    ev_block_collision.send(BlockCollisionEvent);
+                    continue 'event_loop;
+                }
+            }
+        }
+        // Send an event to notify that the shape position has changed
+        if new_position_to_send.relative_position.is_some()
+            || new_position_to_send.rotation.is_some()
+        {
+            debug!("COUCOU");
+            new_tetromino_position_ev.send(new_position_to_send);
         }
     }
 }

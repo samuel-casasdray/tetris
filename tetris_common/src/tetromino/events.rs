@@ -1,5 +1,7 @@
 use bevy::prelude::Event;
 
+use crate::board::components::RelativeGridPosition;
+
 #[derive(Debug, Event)]
 pub struct BlockCollisionEvent;
 
@@ -10,4 +12,16 @@ pub enum MovementEvent {
     Down,
     RotationRight,
     RotationLeft,
+}
+
+#[derive(Debug, Event, Default)]
+pub struct TetrominoMovementEvent {
+    pub relative_position: Option<RelativeGridPosition>,
+    pub rotation: Option<u8>,
+}
+
+#[derive(Debug, Event, Default)]
+pub struct NewTetrominoPositionEvent {
+    pub relative_position: Option<RelativeGridPosition>,
+    pub rotation: Option<u8>,
 }
