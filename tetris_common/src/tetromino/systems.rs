@@ -16,7 +16,7 @@ use crate::components::Owned;
 use crate::tetromino::bundles::OwnedTetrominoBundle;
 use crate::tetromino::components::{GravityTimer, Tetromino, TetrominoShadow};
 use crate::tetromino::events::{
-    BlockCollisionEvent, MovementEvent, NewTetrominoPositionEvent, TetrominoMovementEvent,
+    BlockCollisionEvent, MovementEvent, TetrominoMovementCheckedEvent, TetrominoMovementEvent,
 };
 
 pub fn tetromino_spawner(
@@ -58,9 +58,9 @@ pub fn tetromino_spawner(
 pub fn tetromino_next_move_validator(
     mut controlled_shape_position_q: Query<(&mut GridPosition, &mut Tetromino), With<Owned>>,
     mut controlled_shape_block: Query<&mut RelativeGridPosition, (With<Owned>, With<Block>)>,
-    mut new_tetromino_position_ev: EventReader<NewTetrominoPositionEvent>,
+    mut new_tetromino_position_ev: EventReader<TetrominoMovementCheckedEvent>,
 ) {
-    for NewTetrominoPositionEvent {
+    for TetrominoMovementCheckedEvent {
         relative_position,
         rotation,
     } in new_tetromino_position_ev.read()
@@ -232,7 +232,7 @@ pub fn collision_resolver(
     shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut tetromino_movement_ev: EventReader<TetrominoMovementEvent>,
-    mut new_tetromino_position_ev: EventWriter<NewTetrominoPositionEvent>,
+    mut new_tetromino_position_ev: EventWriter<TetrominoMovementCheckedEvent>,
 ) {
     let (tetromino, tetromino_position, tetromino_children) = match tetromino_q.get_single() {
         Ok(query) => query,
@@ -244,7 +244,7 @@ pub fn collision_resolver(
         rotation,
     } in tetromino_movement_ev.read()
     {
-        let mut new_position_to_send = NewTetrominoPositionEvent {
+        let mut new_position_to_send = TetrominoMovementCheckedEvent {
             relative_position: relative_position.clone(),
             rotation: *rotation,
         };

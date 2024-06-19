@@ -21,7 +21,7 @@ pub struct TetrominoMovementEvent {
 }
 
 #[derive(Debug, Event, Default)]
-pub struct NewTetrominoPositionEvent {
+pub struct TetrominoMovementCheckedEvent {
     pub relative_position: Option<RelativeGridPosition>,
     pub rotation: Option<u8>,
 }
