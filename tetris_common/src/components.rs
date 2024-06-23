@@ -2,10 +2,6 @@ use std::fmt::Display;
 
 use bevy::prelude::Component;
 
-/// An entity controlled by the user running the app
-#[derive(Debug, Component)]
-pub struct Owned;
-
 /// Particularly used to create a fake shape to test collision against
 #[derive(Debug, Component)]
 pub struct Fake;

@@ -6,27 +6,27 @@ use bevy::prelude::{
 };
 
 use crate::board::components::{Block, Board, GridPosition, RelativeGridPosition};
-use crate::components::{Owned, Score};
+use crate::components::Score;
 use crate::tetromino::components::GravityTimer;
 use crate::tetromino::events::BlockCollisionEvent;
 
 pub fn setup_board(mut commands: Commands) {
     commands
-        .spawn((Owned, Board::default(), SpatialBundle::default()))
+        .spawn((Board::default(), SpatialBundle::default()))
         .with_children(|builder| {
             builder.spawn(GravityTimer {
                 timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
             });
-            builder.spawn((Score::new(), Owned));
+            builder.spawn(Score::new());
         });
 }
 
 pub fn line_remove(
     mut commands: Commands,
-    current_board_q: Query<&Board, With<Owned>>,
+    current_board_q: Query<&Board>,
     mut board_blocks_q: Query<
         (Entity, &mut GridPosition),
-        (With<Block>, With<Owned>, Without<RelativeGridPosition>),
+        (With<Block>, Without<RelativeGridPosition>),
     >,
     mut ev_block_collision: EventReader<BlockCollisionEvent>,
     mut score_q: Query<&mut Score>,

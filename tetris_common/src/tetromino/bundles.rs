@@ -1,22 +1,19 @@
 use bevy::prelude::Bundle;
 
 use crate::board::components::{GridPosition, RelativeGridPosition};
-use crate::components::Owned;
 use crate::tetromino::components::{Tetromino, TetrominoShadow};
 
 #[derive(Bundle)]
-pub struct OwnedTetrominoBundle {
-    owned: Owned,
+pub struct TetrominoBundle {
     tetromino: Tetromino,
     tetromino_shadow: TetrominoShadow,
     grid_position: GridPosition,
     grid_position_shadow: RelativeGridPosition,
 }
 
-impl OwnedTetrominoBundle {
+impl TetrominoBundle {
     pub fn new(grid_position: GridPosition, tetromino: Tetromino) -> Self {
         Self {
-            owned: Owned,
             tetromino: tetromino.clone(),
             tetromino_shadow: TetrominoShadow { tetromino },
             grid_position: grid_position.clone(),

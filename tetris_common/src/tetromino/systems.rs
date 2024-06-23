@@ -7,13 +7,12 @@ use bevy::prelude::{
     With, Without,
 };
 
-use crate::board::bundles::OwnedRelativeBlockBundle;
+use crate::board::bundles::RelativeBlockBundle;
 use crate::board::components::{
     Block, Board, DEFAULT_BOARD_HEIGHT, GridPosition, RelativeGridPosition,
 };
 use crate::board::systems::get_grid_position;
-use crate::components::Owned;
-use crate::tetromino::bundles::OwnedTetrominoBundle;
+use crate::tetromino::bundles::TetrominoBundle;
 use crate::tetromino::components::{GravityTimer, Tetromino, TetrominoShadow};
 use crate::tetromino::events::{
     BlockCollisionEvent, MovementEvent, TetrominoMovementCheckedEvent, TetrominoMovementEvent,
@@ -21,8 +20,8 @@ use crate::tetromino::events::{
 
 pub fn tetromino_spawner(
     mut commands: Commands,
-    q_tetromino: Query<&Tetromino, With<Owned>>,
-    board_q: Query<&Board, With<Owned>>,
+    q_tetromino: Query<&Tetromino>,
+    board_q: Query<&Board>,
 ) {
     let tetromino_exists = !q_tetromino.is_empty();
     if tetromino_exists {
@@ -36,7 +35,7 @@ pub fn tetromino_spawner(
 
     commands
         .spawn((
-            OwnedTetrominoBundle::new(
+            TetrominoBundle::new(
                 GridPosition {
                     x: 3,
                     y: board.height as i32,
@@ -48,7 +47,7 @@ pub fn tetromino_spawner(
         .with_children(|child| {
             for relative_positions in positions {
                 child.spawn((
-                    OwnedRelativeBlockBundle::new(relative_positions, color),
+                    RelativeBlockBundle::new(relative_positions, color),
                     SpatialBundle::default(),
                 ));
             }
@@ -56,8 +55,8 @@ pub fn tetromino_spawner(
 }
 
 pub fn tetromino_next_move_validator(
-    mut controlled_shape_position_q: Query<(&mut GridPosition, &mut Tetromino), With<Owned>>,
-    mut controlled_shape_block: Query<&mut RelativeGridPosition, (With<Owned>, With<Block>)>,
+    mut controlled_shape_position_q: Query<(&mut GridPosition, &mut Tetromino)>,
+    mut controlled_shape_block: Query<&mut RelativeGridPosition, With<Block>>,
     mut new_tetromino_position_ev: EventReader<TetrominoMovementCheckedEvent>,
 ) {
     for TetrominoMovementCheckedEvent {
@@ -85,9 +84,9 @@ pub fn tetromino_next_move_validator(
 
 pub fn tetromino_blocks_fixer(
     mut commands: Commands,
-    tetromino_q: Query<(Entity, &Children), (With<Tetromino>, With<Owned>)>,
-    blocks_q: Query<Entity, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
-    board_q: Query<Entity, (With<Owned>, With<Board>)>,
+    tetromino_q: Query<(Entity, &Children), With<Tetromino>>,
+    blocks_q: Query<Entity, (With<Block>, With<RelativeGridPosition>)>,
+    board_q: Query<Entity, With<Board>>,
     mut block_collision_event: EventReader<BlockCollisionEvent>,
 ) {
     for _ in block_collision_event.read() {
@@ -110,9 +109,9 @@ pub fn tetromino_blocks_fixer(
     }
 }
 pub fn shadow_movement(
-    tetromino: Query<(&Tetromino, &GridPosition), With<Owned>>,
-    mut tetromino_shadow: Query<(&mut TetrominoShadow, &mut RelativeGridPosition), With<Owned>>,
-    board_blocks: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
+    tetromino: Query<(&Tetromino, &GridPosition)>,
+    mut tetromino_shadow: Query<(&mut TetrominoShadow, &mut RelativeGridPosition)>,
+    board_blocks: Query<&GridPosition, (With<Block>, Without<RelativeGridPosition>)>,
 ) {
     // If the tetromino exist
     let tetromino_exists = !tetromino.is_empty();
@@ -163,7 +162,7 @@ pub fn shadow_movement(
 
 pub fn movement_system(
     mut movement_event_reader: EventReader<MovementEvent>,
-    mut tetromino: Query<&mut Tetromino, With<Owned>>,
+    mut tetromino: Query<&mut Tetromino>,
     mut new_tetromino_movement_writer: EventWriter<TetrominoMovementEvent>,
 ) {
     for movement in movement_event_reader.read() {
@@ -207,7 +206,7 @@ pub fn movement_system(
 pub fn tetromino_gravity_system(
     time: Res<Time>,
     mut gravity_timer_q: Query<&mut GravityTimer>,
-    board_q: Query<&Board, With<Owned>>,
+    board_q: Query<&Board>,
     mut new_tetromino_position: EventWriter<TetrominoMovementEvent>,
 ) {
     if !board_q.single().enable_gravity {
@@ -226,10 +225,10 @@ pub fn tetromino_gravity_system(
 }
 
 pub fn collision_resolver(
-    board_q: Query<&Board, With<Owned>>,
-    tetromino_q: Query<(&Tetromino, &GridPosition, &Children), With<Owned>>,
-    board_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, Without<RelativeGridPosition>)>,
-    shape_blocks_q: Query<&GridPosition, (With<Block>, With<Owned>, With<RelativeGridPosition>)>,
+    board_q: Query<&Board>,
+    tetromino_q: Query<(&Tetromino, &GridPosition, &Children)>,
+    board_blocks_q: Query<&GridPosition, (With<Block>, Without<RelativeGridPosition>)>,
+    shape_blocks_q: Query<&GridPosition, (With<Block>, With<RelativeGridPosition>)>,
     mut ev_block_collision: EventWriter<BlockCollisionEvent>,
     mut tetromino_movement_ev: EventReader<TetrominoMovementEvent>,
     mut new_tetromino_position_ev: EventWriter<TetrominoMovementCheckedEvent>,

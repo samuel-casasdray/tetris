@@ -6,7 +6,7 @@ use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
 use tetris_common::board::components::{Block, Board, GridPosition};
 use tetris_common::CommonPlugin;
-use tetris_common::components::{Owned, Score, ScoreText};
+use tetris_common::components::{Score, ScoreText};
 use tetris_common::tetromino::components::{MovementTimer, RotationTimer};
 use tetris_common::tetromino::events::MovementEvent;
 
@@ -40,7 +40,7 @@ fn main() {
         .run()
 }
 
-fn ui_example_system(mut contexts: EguiContexts, mut board_q: Query<&mut Board, With<Owned>>) {
+fn ui_example_system(mut contexts: EguiContexts, mut board_q: Query<&mut Board>) {
     let mut board = board_q.single_mut();
     egui::Window::new("Admin menu").show(contexts.ctx_mut(), |ui| {
         ui.heading("Game settings");
