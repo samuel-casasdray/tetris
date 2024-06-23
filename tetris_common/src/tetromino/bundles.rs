@@ -1,6 +1,6 @@
 use bevy::prelude::Bundle;
 
-use crate::board::components::{GridPosition, RelativeGridPosition};
+use crate::board::components::GridPosition;
 use crate::tetromino::components::{Tetromino, TetrominoShadow};
 
 #[derive(Bundle)]
@@ -8,7 +8,6 @@ pub struct TetrominoBundle {
     tetromino: Tetromino,
     tetromino_shadow: TetrominoShadow,
     grid_position: GridPosition,
-    grid_position_shadow: RelativeGridPosition,
 }
 
 impl TetrominoBundle {
@@ -17,10 +16,6 @@ impl TetrominoBundle {
             tetromino: tetromino.clone(),
             tetromino_shadow: TetrominoShadow { tetromino },
             grid_position: grid_position.clone(),
-            grid_position_shadow: RelativeGridPosition {
-                x: grid_position.x,
-                y: grid_position.y,
-            },
         }
     }
 

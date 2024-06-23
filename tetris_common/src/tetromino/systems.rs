@@ -21,37 +21,44 @@ use crate::tetromino::events::{
 pub fn tetromino_spawner(
     mut commands: Commands,
     q_tetromino: Query<&Tetromino>,
-    board_q: Query<&Board>,
+    board_q: Query<(&Board, Entity, &Children)>,
 ) {
-    let tetromino_exists = !q_tetromino.is_empty();
-    if tetromino_exists {
-        return;
-    }
-
-    let tetromino = Tetromino::get_random_shape();
-    let color = tetromino.shape.color();
-    let positions = tetromino.get_blocks_positions();
-    let board = board_q.single();
-
-    commands
-        .spawn((
-            TetrominoBundle::new(
-                GridPosition {
-                    x: 3,
-                    y: board.height as i32,
-                },
-                tetromino,
-            ),
-            SpatialBundle::default(),
-        ))
-        .with_children(|child| {
-            for relative_positions in positions {
-                child.spawn((
-                    RelativeBlockBundle::new(relative_positions, color),
-                    SpatialBundle::default(),
-                ));
+    // Adding a tetromino to each board in the game
+    'board_loop: for (board, board_entity, board_children) in board_q.iter() {
+        for &child in board_children.iter() {
+            if q_tetromino.get(child).is_ok() {
+                continue 'board_loop;
             }
-        });
+        }
+
+        let tetromino = Tetromino::get_random_shape();
+        let color = tetromino.shape.color();
+        let positions = tetromino.get_blocks_positions();
+
+        commands
+            .entity(board_entity)
+            .with_children(|child_command| {
+                child_command
+                    .spawn((
+                        TetrominoBundle::new(
+                            GridPosition {
+                                x: 3,
+                                y: board.height as i32,
+                            },
+                            tetromino,
+                        ),
+                        SpatialBundle::default(),
+                    ))
+                    .with_children(|child| {
+                        for relative_positions in positions {
+                            child.spawn((
+                                RelativeBlockBundle::new(relative_positions, color),
+                                SpatialBundle::default(),
+                            ));
+                        }
+                    });
+            });
+    }
 }
 
 pub fn tetromino_next_move_validator(
@@ -113,12 +120,10 @@ pub fn shadow_movement(
     mut tetromino_shadow: Query<(&mut TetrominoShadow, &mut RelativeGridPosition)>,
     board_blocks: Query<&GridPosition, (With<Block>, Without<RelativeGridPosition>)>,
 ) {
-    // If the tetromino exist
-    let tetromino_exists = !tetromino.is_empty();
-    if tetromino_exists {
+    if let (Ok(tetromino), Ok(mut tetromino_shadow)) =
+        (tetromino.get_single(), tetromino_shadow.get_single_mut())
+    {
         // Copy of tetromino into his shadow
-        let tetromino = tetromino.single();
-        let mut tetromino_shadow = tetromino_shadow.single_mut();
         tetromino_shadow.0.tetromino = tetromino.0.clone();
 
         // Place the shadow at the bottom
