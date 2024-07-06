@@ -53,7 +53,6 @@ mod tests {
 
     use crate::board::components::{Block, Board, GridPosition};
     use crate::board::systems::relative_position_system;
-    use crate::components::Owned;
     use crate::tetromino::components::{GravityTimer, Tetromino};
     use crate::tetromino::systems::tetromino_gravity_system;
 
@@ -86,11 +85,10 @@ mod tests {
         let tetromino = Tetromino::get_random_shape();
         let positions = tetromino.get_blocks_positions();
         commands
-            .spawn((Owned, tetromino, GridPosition { x: 5, y: 10 }))
+            .spawn((tetromino, GridPosition { x: 5, y: 10 }))
             .with_children(|child| {
                 for relative_positions in positions {
                     child.spawn((
-                        Owned,
                         Block {
                             color: Color::ORANGE,
                         },
@@ -103,7 +101,7 @@ mod tests {
 
     fn setup_block(mut commands: Commands) {
         let board_entity = commands
-            .spawn((Owned, Board::default(), SpatialBundle::default()))
+            .spawn((Board::default(), SpatialBundle::default()))
             .id();
 
         commands.spawn(GravityTimer {
@@ -115,7 +113,6 @@ mod tests {
             .map(|(x, y)| {
                 commands
                     .spawn((
-                        Owned,
                         Block {
                             color: Color::ORANGE,
                         },
@@ -132,10 +129,7 @@ mod tests {
         commands.entity(board_entity).push_children(&block_entities);
     }
 
-    fn draw_system(
-        blocks: Query<&GridPosition, (With<Owned>, With<Block>)>,
-        board: Query<&Board, With<Owned>>,
-    ) {
+    fn draw_system(blocks: Query<&GridPosition, With<Block>>, board: Query<&Board>) {
         let board = board.single();
         let mut game_board = vec![" "; board.height * board.width];
 
