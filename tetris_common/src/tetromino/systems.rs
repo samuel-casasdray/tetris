@@ -16,12 +16,14 @@ use crate::tetromino::bundles::TetrominoBundle;
 use crate::tetromino::components::{GravityTimer, Tetromino, TetrominoShadow};
 use crate::tetromino::events::{
     BlockCollisionEvent, MovementEvent, TetrominoMovementCheckedEvent, TetrominoMovementEvent,
+    TetrominoSpawnEvent,
 };
 
 pub fn tetromino_spawner(
     mut commands: Commands,
     q_tetromino: Query<&Tetromino>,
     board_q: Query<(&Board, Entity, &Children)>,
+    mut ev_spawn_event: EventWriter<TetrominoSpawnEvent>,
 ) {
     // Adding a tetromino to each board in the game
     'board_loop: for (board, board_entity, board_children) in board_q.iter() {
@@ -34,6 +36,11 @@ pub fn tetromino_spawner(
         let tetromino = Tetromino::get_random_shape();
         let color = tetromino.shape.color();
         let positions = tetromino.get_blocks_positions();
+
+        ev_spawn_event.send(TetrominoSpawnEvent {
+            rotation: tetromino.rotation,
+            shape: tetromino.shape.clone(),
+        });
 
         commands
             .entity(board_entity)

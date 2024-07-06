@@ -3,6 +3,7 @@ use bevy::prelude::{App, IntoSystemConfigs, Plugin, PreUpdate, Startup};
 use crate::board::systems::{line_remove, relative_position_system, setup_board};
 use crate::tetromino::events::{
     BlockCollisionEvent, MovementEvent, TetrominoMovementCheckedEvent, TetrominoMovementEvent,
+    TetrominoSpawnEvent,
 };
 use crate::tetromino::systems::{
     collision_resolver, movement_system, shadow_movement, tetromino_blocks_fixer,
@@ -21,6 +22,7 @@ impl Plugin for CommonPlugin {
             .add_event::<MovementEvent>()
             .add_event::<TetrominoMovementCheckedEvent>()
             .add_event::<TetrominoMovementEvent>()
+            .add_event::<TetrominoSpawnEvent>()
             .add_systems(Startup, setup_board)
             .add_systems(
                 PreUpdate,
